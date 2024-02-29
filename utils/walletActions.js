@@ -9,6 +9,7 @@ async function generateAndSaveWallet(id){
     const address = privateKeyToAccount(pk).address
     //add logic to save account and pk to db
     const success = await walletController.createWallet(id,address,pk)
+    console.log(success)
     return {address:address,pk:pk,success:success}
 }
 
@@ -16,5 +17,9 @@ async function doesWalletExist(id){
     return await walletController.doesWalletExist(id)
 }
 
-module.exports = {generateAndSaveWallet,doesWalletExist}
+async function importWallet(id, pk){
+    return await walletController.importWallet(id, pk)
+}
+
+module.exports = {generateAndSaveWallet,doesWalletExist,importWallet}
 
