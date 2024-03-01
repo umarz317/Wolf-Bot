@@ -1,5 +1,5 @@
 const Wallet = require("../models/wallet");
-const { privateKeyToAccount } = require('viem/accounts');
+const { privateKeyToAccount } = require("viem/accounts");
 module.exports = {
   createWallet: async (Id, address, pk) => {
     try {
@@ -10,7 +10,7 @@ module.exports = {
       } else {
         wallet = new Wallet({
           id: Id,
-          wallets: [{ address: address, privateKey: pk }]
+          wallets: [{ address: address, privateKey: pk }],
         });
       }
       await wallet.save();
@@ -25,42 +25,50 @@ module.exports = {
   importWallet: async (id, pk) => {
     try {
       console.log(id, pk);
-      if (pk.startsWith('0x')) {
+      if (pk.startsWith("0x")) {
         pk = pk.substring(2);
       }
       const walletInstance = new privateKeyToAccount(pk);
       let wallet = await Wallet.findOne({ id: id });
-      const existingWallet = wallet ? wallet.wallets.find(w => w.address === walletInstance.address) : null;
-  
+      const existingWallet = wallet
+        ? wallet.wallets.find((w) => w.address === walletInstance.address)
+        : null;
       if (existingWallet) {
-        console.log('Wallet already exists in the database.');
-        return { success: false, message: 'Wallet already exists.' };
+        console.log("Wallet already exists in the database.");
+        return false;
       }
-  
+
       if (wallet) {
-        wallet.wallets.push({ address: walletInstance.address, privateKey: pk });
+        wallet.wallets.push({
+          address: walletInstance.address,
+          privateKey: pk,
+        });
       } else {
         wallet = new Wallet({
           id: id,
-          wallets: [{ address: walletInstance.address, privateKey: pk }]
+          wallets: [{ address: walletInstance.address, privateKey: pk }],
         });
       }
       await wallet.save();
-      console.log(`Wallet imported successfully! Public Key: ${walletInstance.address}`);
-      return { success: true, message: 'Wallet imported successfully.' };
+      console.log(
+        `Wallet imported successfully! Public Key: ${walletInstance.address}`
+      );
+      return { success: true, message: "Wallet imported successfully." };
     } catch (err) {
       console.log("Failed!");
       console.log(err);
-      return { success: false, message: 'Failed to import wallet due to an error.' };
+      return {
+        success: false,
+        message: "Failed to import wallet due to an error.",
+      };
     }
-  },  
+  },
   doesWalletExist: async (id) => {
-    const wallet = await Wallet.findOne({ id: id })
+    const wallet = await Wallet.findOne({ id: id });
     if ((wallet && wallet.wallets.length < 5) || !wallet) {
-      return true
+      return true;
+    } else {
+      return false;
     }
-    else {
-      return false
-    }
-  }
+  },
 };

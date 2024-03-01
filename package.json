@@ -9,7 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@uniswap/sdk-core": "^4.1.4",
     "@uniswap/v2-periphery": "^1.1.0-beta.0",
+    "@uniswap/v2-sdk": "^4.2.1",
     "@uniswap/v3-periphery": "^1.4.4",
     "dot-env": "^0.0.1",
     "dotenv": "^16.4.5",

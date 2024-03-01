@@ -9,10 +9,9 @@ function watchPairEvent(tokenToSnipe) {
     event: abiV2Factory.abi.filter((abi) => abi.name == "PairCreated")[0],
     onLogs: (logs) => {
       const tokens = getTokensFromEventTopic(logs.topics);
-      //add snipeable token check
-        if (isPairSnipeable(tokenToSnipe, tokens)) {
-            console.log("Pair Created", tokens);
-        }
+      if (isPairSnipeable(tokenToSnipe, tokens)) {
+        console.log("Pair Created", tokens);
+      }
     },
     onError: (err) => {
       console.log(err);

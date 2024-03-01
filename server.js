@@ -1,5 +1,5 @@
 const express = require("express");
-require('./telegram/bot')
+require("./telegram/bot");
 const app = express();
 require("./mempool/mempool");
 require("./config/db");
