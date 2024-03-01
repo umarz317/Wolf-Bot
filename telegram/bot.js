@@ -1,14 +1,14 @@
 require("dotenv").config();
-const ethers = require('ethers')
 const { Telegraf, Markup, Scenes, session } = require("telegraf");
 const { WizardScene, Stage } = Scenes; // Ensure Stage is also imported
 const walletActions = require("../utils/walletActions");
+const { privateKeyToAddress } = require("viem/accounts");
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
 // Define the 'import-wallet' WizardScene
 const importWalletScene = new WizardScene(
-  'import-wallet',
+  "import-wallet",
   // (ctx) => {
   //   ctx.reply('Please enter wallet name:');
   //   return ctx.wizard.next();
@@ -23,11 +23,11 @@ const importWalletScene = new WizardScene(
   },
   async (ctx) => {
     function isValidPrivateKey(pk) {
-      if (pk.startsWith('0x')) {
+      if (pk.startsWith("0x")) {
         pk = pk.substring(2);
       }
       try {
-        new ethers.Wallet(pk);
+        new privateKeyToAddress(pk);
         return true;
       } catch (error) {
         return false;
@@ -54,7 +54,6 @@ const importWalletScene = new WizardScene(
     return ctx.scene.leave();
   }
 );
-
 
 const stage = new Stage([importWalletScene]);
 bot.use(session());
@@ -85,7 +84,9 @@ bot.start(async (ctx) => {
 bot.action("createWallet", async (ctx) => {
   var res = await walletActions.doesWalletExist(ctx.chat.id);
   if (res) {
-    const { address, pk, success } = await walletActions.generateAndSaveWallet(ctx.chat.id);
+    const { address, pk, success } = await walletActions.generateAndSaveWallet(
+      ctx.chat.id
+    );
     if (success) {
       ctx.reply(
         `✅ Successfully Created Wallet\n
@@ -110,7 +111,7 @@ bot.action("createWallet", async (ctx) => {
 bot.action("importWallet", async (ctx) => {
   var res = await walletActions.doesWalletExist(ctx.chat.id);
   if (res) {
-    ctx.scene.enter('import-wallet');
+    ctx.scene.enter("import-wallet");
   } else {
     ctx.reply(`✅ You have reached wallet creation limit`, {
       parse_mode: "MarkdownV2",

@@ -1,4 +1,9 @@
-const publicClient = require("./client");
+const publicClient = require("../utils/client");
+
+/*
+    Implement removing the event listener logic,
+    and add the logic to watch for pending transactions
+*/
 
 // publicClient.watchPendingTransactions({
 //   onTransactions: (hashes) => {
