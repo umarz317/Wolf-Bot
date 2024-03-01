@@ -1,6 +1,6 @@
 require("dotenv").config();
 const { Telegraf, Markup, Scenes, session } = require("telegraf");
-const { WizardScene, Stage } = Scenes; // Ensure Stage is also imported
+const { WizardScene, Stage } = Scenes;
 const walletActions = require("../utils/walletActions");
 const { privateKeyToAddress } = require("viem/accounts");
 
@@ -9,16 +9,11 @@ const bot = new Telegraf(process.env.BOT_TOKEN);
 // Define the 'import-wallet' WizardScene
 const importWalletScene = new WizardScene(
   "import-wallet",
-  // (ctx) => {
-  //   ctx.reply('Please enter wallet name:');
-  //   return ctx.wizard.next();
-  // },
   (ctx) => {
-    //ctx.wizard.state.name = ctx.message.text;
-    ctx.reply('Please enter your private key 🔑\n\n (Make sure not to share it with anyone!):',
-      Markup.inlineKeyboard([
-        Markup.button.callback('Cancel', 'cancelImport')
-      ]));
+    ctx.reply(
+      "Please enter your private key 🔑\n\n (Make sure not to share it with anyone!):",
+      Markup.inlineKeyboard([Markup.button.callback("Cancel", "cancelImport")])
+    );
     return ctx.wizard.next();
   },
   async (ctx) => {
@@ -27,7 +22,7 @@ const importWalletScene = new WizardScene(
         pk = pk.substring(2);
       }
       try {
-        new privateKeyToAddress(pk);
+        privateKeyToAddress(pk);
         return true;
       } catch (error) {
         return false;
@@ -35,20 +30,27 @@ const importWalletScene = new WizardScene(
     }
 
     if (!ctx.message) {
-      ctx.reply('Operation canceled. Feel free to start over or use other commands.');
-      return ctx.scene.leave()
-    };
+      ctx.reply(
+        "Operation canceled. Feel free to start over or use other commands."
+      );
+      return ctx.scene.leave();
+    }
     const pk = ctx.message.text;
     if (!isValidPrivateKey(pk)) {
-      ctx.reply('❌ Invalid private key.\n\n Please make sure to enter a valid private key 🔑:');
+      ctx.reply(
+        "❌ Invalid private key.\n\n Please make sure to enter a valid private key 🔑:"
+      );
       return;
     }
-    //const res = await walletActions.importWallet(ctx.chat.id, ctx.wizard.state.name, pk);
     const res = await walletActions.importWallet(ctx.chat.id, pk);
     if (res.success) {
-      ctx.reply('✅ ' + res.message);
+      ctx.reply("✅ " + res.message);
     } else {
-      ctx.reply('❌ ' + res.message + "Please make sure to enter a valid private key 🔑:");
+      ctx.reply(
+        "❌ " +
+          res.message +
+          "Please make sure to enter a valid private key 🔑:"
+      );
       return;
     }
     return ctx.scene.leave();
@@ -68,14 +70,15 @@ bot.start(async (ctx) => {
       parse_mode: "MarkdownV2",
       ...Markup.inlineKeyboard([
         Markup.button.callback("🪪 Create Wallet", "createWallet"),
-        Markup.button.callback("🔑 Import Existing Wallet", "importWallet")
+        Markup.button.callback("🔑 Import Existing Wallet", "importWallet"),
       ]),
     });
   } else {
     ctx.reply(
-      `*🎯 Diablo Bot*\n\n*Trade Faster\\!*\n\nYou have reached wallet creation limit`, {
-      parse_mode: "MarkdownV2",
-    }
+      `*🎯 Diablo Bot*\n\n*Trade Faster\\!*\n\nYou have reached wallet creation limit`,
+      {
+        parse_mode: "MarkdownV2",
+      }
     );
   }
 });
@@ -119,8 +122,10 @@ bot.action("importWallet", async (ctx) => {
   }
 });
 
-bot.action('cancelImport', (ctx) => {
-  ctx.reply('Operation canceled. Feel free to start over or use other commands.');
+bot.action("cancelImport", (ctx) => {
+  ctx.reply(
+    "Operation canceled. Feel free to start over or use other commands."
+  );
   return ctx.scene.leave();
 });
 

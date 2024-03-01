@@ -1,5 +1,5 @@
 const abiV2Factory = require("@uniswap/v2-periphery/build/IUniswapV2Factory.json");
-const client = require("../utils/client");
+const client = require("../utils/publicClient");
 const { trim } = require("viem");
 require("dotenv").config();
 

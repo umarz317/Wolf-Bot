@@ -1,4 +1,4 @@
-const publicClient = require("../utils/client");
+const publicClient = require("../utils/publicClient");
 
 /*
     Implement removing the event listener logic,
