@@ -7,7 +7,7 @@ var db = mongoose.connection
 async function generateAndSaveWallet(id){
     const pk = generatePrivateKey()
     const address = privateKeyToAccount(pk).address
-    //add logic to save account and pk to db
+    //added logic to save account and pk to db
     const success = await walletController.createWallet(id,address,pk)
     console.log(success)
     return {address:address,pk:pk,success:success}
