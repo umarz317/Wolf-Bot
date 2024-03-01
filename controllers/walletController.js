@@ -1,16 +1,17 @@
 const Wallet = require("../models/wallet");
 const { privateKeyToAccount } = require("viem/accounts");
+const {encrypt,decrypt,generateIV} = require("../utils/keyManagement");
 module.exports = {
   createWallet: async (Id, address, pk) => {
     try {
       let wallet = await Wallet.findOne({ id: Id });
 
       if (wallet) {
-        wallet.wallets.push({ address: address, privateKey: pk });
+        wallet.wallets.push({ address: address, privateKey: encrypt(pk) });
       } else {
         wallet = new Wallet({
           id: Id,
-          wallets: [{ address: address, privateKey: pk }],
+          wallets: [{ address: address, privateKey:  encrypt(pk) }],
         });
       }
       await wallet.save();
@@ -24,9 +25,8 @@ module.exports = {
   },
   importWallet: async (id, pk) => {
     try {
-      console.log(id, pk);
-      if (pk.startsWith("0x")) {
-        pk = pk.substring(2);
+      if (!pk.startsWith("0x")) {
+        pk = "0x"+pk;
       }
       const walletInstance = new privateKeyToAccount(pk);
       let wallet = await Wallet.findOne({ id: id });
@@ -35,18 +35,21 @@ module.exports = {
         : null;
       if (existingWallet) {
         console.log("Wallet already exists in the database.");
-        return false;
+        return {
+          success: false,
+          message: "Wallet already exists.",
+        };
       }
 
       if (wallet) {
         wallet.wallets.push({
           address: walletInstance.address,
-          privateKey: pk,
+          privateKey:  encrypt(pk) ,
         });
       } else {
         wallet = new Wallet({
           id: id,
-          wallets: [{ address: walletInstance.address, privateKey: pk }],
+          wallets: [{ address: walletInstance.address, privateKey:  encrypt(pk)  }],
         });
       }
       await wallet.save();

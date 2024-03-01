@@ -18,8 +18,8 @@ const importWalletScene = new WizardScene(
   },
   async (ctx) => {
     function isValidPrivateKey(pk) {
-      if (pk.startsWith("0x")) {
-        pk = pk.substring(2);
+      if (!pk.startsWith("0x")) {
+        pk = "0x"+pk;
       }
       try {
         privateKeyToAddress(pk);
