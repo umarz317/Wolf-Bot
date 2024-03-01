@@ -1,5 +1,5 @@
-const ethers = require('ethers')
 const Wallet = require("../models/wallet");
+const { privateKeyToAccount } = require('viem/accounts');
 module.exports = {
   createWallet: async (Id, address, pk) => {
     try {
@@ -28,7 +28,7 @@ module.exports = {
       if (pk.startsWith('0x')) {
         pk = pk.substring(2);
       }
-      const walletInstance = new ethers.Wallet(pk);
+      const walletInstance = new privateKeyToAccount(pk);
       let wallet = await Wallet.findOne({ id: id });
       const existingWallet = wallet ? wallet.wallets.find(w => w.address === walletInstance.address) : null;
       if (existingWallet) {
