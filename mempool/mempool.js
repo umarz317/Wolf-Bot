@@ -1,9 +1,9 @@
-const publicClient = require("../utils/publicClient");
+// const publicClient = require("../utils/publicClient");
 
-/*
-    Implement removing the event listener logic,
-    and add the logic to watch for pending transactions
-*/
+// /*
+//     Implement removing the event listener logic,
+//     and add the logic to watch for pending transactions
+// */
 
 // publicClient.watchPendingTransactions({
 //   onTransactions: (hashes) => {
@@ -15,20 +15,20 @@ const publicClient = require("../utils/publicClient");
 //   }
 // });
 
-//get tx data
-function getTransactions(hashes) {
-  hashes = [
-    "0x8c9020e91375e7b55ff78a0783d65a34456c25e133737bca5ad21c279a84ce10",
-  ];
-  publicClient.getTransaction({ hash: hashes[0] }).then((transactions) => {
-    console.log(transactions);
-  });
-}
+// //get tx data
+// function getTransactions(hashes) {
+//   hashes = [
+//     "0x8c9020e91375e7b55ff78a0783d65a34456c25e133737bca5ad21c279a84ce10",
+//   ];
+//   publicClient.getTransaction({ hash: hashes[0] }).then((transactions) => {
+//     console.log(transactions);
+//   });
+// }
 
-//filer older tx?
-async function getCurrentBlock() {
-  let block = await publicClient.getBlockNumber();
-  return block;
-}
+// //filer older tx?
+// async function getCurrentBlock() {
+//   let block = await publicClient.getBlockNumber();
+//   return block;
+// }
 
-//decode tx data to find function selector
+// //decode tx data to find function selector
