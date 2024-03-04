@@ -7,7 +7,13 @@ const {
   Percent,
 } = require("@uniswap/sdk-core");
 const { Pair, Route, Trade } = require("@uniswap/v2-sdk");
-const { getContract, erc20Abi, parseUnits, parseEther } = require("viem");
+const {
+  getContract,
+  erc20Abi,
+  parseUnits,
+  parseEther,
+  formatEther,
+} = require("viem");
 const UniswapV2PairABI = require("@uniswap/v2-periphery/build/IUniswapV2Pair.json");
 const { bot } = require("../../telegram/bot");
 const client = require("../../utils/client");
@@ -44,15 +50,16 @@ async function fetchTrade(addressToken0, amountIn) {
 async function submitSwapTx(addressToken0, amountIn, account) {
   try {
     const [trade, token0, token1] = await fetchTrade(addressToken0, amountIn);
-    const router = contractHelper.getRouter();
+    const walletClient = await client.getWalletClientFromAccount(account);
+    const router = contractHelper.getRouter(walletClient);
     const slippageTolerance = new Percent("50", "10000");
     const amountOutMin = trade.minimumAmountOut(slippageTolerance).toExact();
     const path = [token1.address, token0.address];
     const deadline = Math.floor(Date.now() / 1000) + 60 * 5;
     const value = trade.inputAmount.toExact();
     const txHash = await router.write.swapExactETHForTokens(
-      [parseUnits(amountOutMin), path, account, deadline],
-      { value: parseEther(value) }
+      [parseUnits(amountOutMin), path, account.address, deadline],
+      { value: parseEther(value), gas: 3000000n}
     );
     return txHash;
   } catch (e) {
@@ -62,9 +69,8 @@ async function submitSwapTx(addressToken0, amountIn, account) {
   }
 }
 
-async function snipeToken(tokenToSnipe, amountIn, account) {
-  amountIn = "10000000000000000"; //0.001
-  account = "0xfe634096C9055FE24bC7C8Ea20c87741d1018527";
+async function snipeToken(chat_ID, tokenToSnipe, amountIn, account) {
+  amountIn = parseEther(amountIn).toString();
   const txHash = await submitSwapTx(tokenToSnipe, amountIn, account);
   if (!txHash) return;
   try {
@@ -73,10 +79,20 @@ async function snipeToken(tokenToSnipe, amountIn, account) {
     });
     if (txReceipt.status === "success") {
       console.log("Transaction successful.");
-      //yahan send message to user ky snipe is successful
+      bot.telegram.sendMessage(
+        chat_ID,
+        `✅ Snipe Successful\n\n🎯 Token: ${tokenToSnipe}\n\n💰 Amount: ${formatEther(
+          amountIn
+        )}`
+      );
     } else {
       console.log("Transaction failed.");
-      //yahan send message to user ky snipe has failed
+      bot.telegram.sendMessage(
+        chat_ID,
+        `❌ Snipe Failed\n\n🎯 Token: ${tokenToSnipe}\n\n💰 Amount: ${formatEther(
+          amountIn
+        )}`
+      );
     }
   } catch (e) {
     console.log(e);
@@ -103,7 +119,9 @@ async function testSnipe(chat_ID, amount, tokenSniped) {
   await new Promise((resolve) => setTimeout(resolve, 1000));
   bot.telegram.sendMessage(
     chat_ID,
-    `✅ Snipe Test Successful\n\n🎯 Token: ${tokenSniped}\n\n💰 Amount: ${amount}`
+    `✅ Snipe Test Successful\n\n🎯 Token: ${tokenSniped}\n\n💰 Amount: ${formatEther(
+      amount
+    )}`
   );
 }
 

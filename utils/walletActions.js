@@ -17,8 +17,12 @@ async function doesWalletExist(id) {
   return await walletController.doesWalletExist(id);
 }
 
+async function getAllWallets(id) {
+  return await walletController.getAllWallets(id);
+}
+
 async function importWallet(id, pk) {
   return await walletController.importWallet(id, pk);
 }
 
-module.exports = { generateAndSaveWallet, doesWalletExist, importWallet };
+module.exports = { generateAndSaveWallet, doesWalletExist, importWallet,getAllWallets };

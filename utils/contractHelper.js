@@ -10,11 +10,11 @@ module.exports = {
     });
     return contract;
   },
-  getRouter: () => {
+  getRouter: (walletClient) => {
     var contract = getContract({
       address: process.env.ROUTER_V2,
       abi: uniswapV2RouterABI.abi,
-      client: client.walletClient,
+      client: walletClient,
     });
     return contract;
   },

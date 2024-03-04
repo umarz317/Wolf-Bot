@@ -1,6 +1,6 @@
 const Wallet = require("../models/wallet");
 const { privateKeyToAccount } = require("viem/accounts");
-const {encrypt,decrypt,generateIV} = require("../utils/keyManagement");
+const { encrypt, decrypt, generateIV } = require("../utils/keyManagement");
 module.exports = {
   createWallet: async (Id, address, pk) => {
     try {
@@ -11,7 +11,7 @@ module.exports = {
       } else {
         wallet = new Wallet({
           id: Id,
-          wallets: [{ address: address, privateKey:  encrypt(pk) }],
+          wallets: [{ address: address, privateKey: encrypt(pk) }],
         });
       }
       await wallet.save();
@@ -26,7 +26,7 @@ module.exports = {
   importWallet: async (id, pk) => {
     try {
       if (!pk.startsWith("0x")) {
-        pk = "0x"+pk;
+        pk = "0x" + pk;
       }
       const walletInstance = new privateKeyToAccount(pk);
       let wallet = await Wallet.findOne({ id: id });
@@ -44,12 +44,14 @@ module.exports = {
       if (wallet) {
         wallet.wallets.push({
           address: walletInstance.address,
-          privateKey:  encrypt(pk) ,
+          privateKey: encrypt(pk),
         });
       } else {
         wallet = new Wallet({
           id: id,
-          wallets: [{ address: walletInstance.address, privateKey:  encrypt(pk)  }],
+          wallets: [
+            { address: walletInstance.address, privateKey: encrypt(pk) },
+          ],
         });
       }
       await wallet.save();
@@ -74,4 +76,10 @@ module.exports = {
       return false;
     }
   },
+  getAllWallets: async (id) => {
+    const wallets = await Wallet.findOne({id:id});
+    return wallets.wallets;
+  },
 };
+
+

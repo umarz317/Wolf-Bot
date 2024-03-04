@@ -1,18 +1,20 @@
 const abiV2Factory = require("@uniswap/v2-periphery/build/IUniswapV2Factory.json");
 const client = require("../utils/client");
-const { trim } = require("viem");
+const { trim, getAddress } = require("viem");
 const transactionHandler = require("../transactionHandler/V2/handler");
-const { set } = require("mongoose");
 require("dotenv").config();
 
-function watchPairEvent(tokenToSnipe, amount, account) {
-  client.watchEvent({
+function watchPairEvent(chat_ID,tokenToSnipe, amount, account) {
+  client.publicClient.watchEvent({
     address: process.env.PAIR_V2_FACTORY,
     event: abiV2Factory.abi.filter((abi) => abi.name == "PairCreated")[0],
     onLogs: (logs) => {
-      const tokens = getTokensFromEventTopic(logs.topics);
+      console.log('Pair created!')
+      console.log(logs)
+      const tokens = getTokensFromEventTopic(logs[0].topics);
       if (isPairSnipeable(tokenToSnipe, tokens)) {
-        transactionHandler.snipeToken(tokenToSnipe, amount, account);
+        console.log('Pair snipeable!')
+        transactionHandler.snipeToken(chat_ID,tokenToSnipe, amount, account);
       }
     },
     onError: (err) => {
@@ -26,6 +28,7 @@ function getTokensFromEventTopic(topics) {
 }
 
 function isPairSnipeable(snipeToken, tokens) {
+  tokens = tokens.map((token) => getAddress(token));
   return tokens.includes(snipeToken);
 }
 

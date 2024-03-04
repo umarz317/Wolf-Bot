@@ -2,14 +2,18 @@ const { createPublicClient, http, createWalletClient } = require("viem");
 const { privateKeyToAccount } = require("viem/accounts");
 const { mainnet, polygon, sepolia, goerli } = require("viem/chains");
 require("dotenv").config();
+const keyManagement = require('./keyManagement')
 
 const publicClient = createPublicClient({
   chain: goerli,
   transport: http(process.env.RPC),
 });
-const walletClient = createWalletClient({
-  chain: goerli,
-  transport: http(process.env.RPC),
-  account: privateKeyToAccount(process.env.PK),
-});
-module.exports = { publicClient, walletClient };
+async function getWalletClientFromAccount(account) {
+  const walletClient = createWalletClient({
+    chain: goerli,
+    transport: http(process.env.RPC),
+    account: privateKeyToAccount(keyManagement.decrypt(account.privateKey)),
+  });
+  return walletClient
+}
+module.exports = { publicClient, getWalletClientFromAccount };

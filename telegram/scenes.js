@@ -1,8 +1,9 @@
 const { Markup, Scenes } = require("telegraf");
 const { WizardScene } = Scenes;
-const { walletActions, isAddress } = require("viem");
+const walletActions  = require("../utils/walletActions");
 const helpers = require("../utils/helpers");
 const event = require("../EventListner/PairCreated");
+const handler = require("../transactionHandler/V2/handler");
 
 const importWalletScene = new WizardScene(
   "import-wallet",
@@ -68,22 +69,28 @@ const snipeScene = new WizardScene(
     await new Promise((resolve) => setTimeout(resolve, 1000));
     ctx.session.messages = [token];
     ctx.wizard.next();
+    console.log('here')
+    ctx.message.text = null;
     return ctx.wizard.steps[ctx.wizard.cursor](ctx);
   },
   (ctx) => {
     ctx.reply("➡️Enter the amount you want to snipe:");
-    const amount = ctx.message.text;
     return ctx.wizard.next();
   },
   async (ctx) => {
     const amount = ctx.message.text;
+    var tmp = ctx.session.messages
+    tmp.push(amount)
+    ctx.session.messages = tmp
     if (isNaN(amount)) {
       ctx.reply("❌ Invalid amount.\n\nPlease enter a valid amount:");
       return;
     }
     ctx.reply("✅ Snipe setup complete, We'll snipe the token and update you.");
     //improve this.... make snipe file handling snipe(watch and submit tx)
-    event.testEvent(ctx.chat.id, amount, ctx.session.messages[0]);
+    const wallet = await walletActions.getAllWallets(ctx.chat.id);
+    // handler.snipeToken(ctx.chat.id, ctx.session.messages[0],ctx.session.messages[1], wallet[0]);
+    event.watchPairEvent(ctx.chat.id, ctx.session.messages[0],ctx.session.messages[1], wallet[0]);
     ctx.scene.leave();
   }
 );

@@ -7,11 +7,13 @@ console.log("bot....start");
 bot.use(session());
 module.exports = { bot }; //important to keep it here
 const scenes = require("./scenes");
+const { getAllWallets } = require("../controllers/walletController");
 const stage = new Stage([scenes.importWalletScene, scenes.snipeScene]);
 bot.use(stage.middleware());
 
 // Start command
 bot.start(async (ctx) => {
+  console.log(ctx.chat.id)
   const res = await walletActions.doesWalletExist(ctx.chat.id);
   if (res) {
     ctx.reply(`*🎯 Diablo Bot*\n\n*Trade Faster\\!*\n\n`, {
@@ -84,3 +86,4 @@ bot.action("cancelImport", (ctx) => {
 });
 
 bot.launch();
+
