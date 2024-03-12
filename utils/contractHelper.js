@@ -1,6 +1,7 @@
 const { getContract, erc20Abi } = require("viem");
 const client = require("./client");
 const uniswapV2RouterABI = require("@uniswap/v2-periphery/build/IUniswapV2Router02.json");
+const V3SwapRouterABI  = require('@uniswap/v3-periphery/artifacts/contracts/SwapRouter.sol/SwapRouter.json')
 module.exports = {
   getToken: (address) => {
     var contract = getContract({
@@ -14,6 +15,14 @@ module.exports = {
     var contract = getContract({
       address: process.env.ROUTER_V2,
       abi: uniswapV2RouterABI.abi,
+      client: walletClient,
+    });
+    return contract;
+  },
+  getRouterV3: (walletClient) => {
+    var contract = getContract({
+      address: process.env.V3_ROUTER,
+      abi: V3SwapRouterABI.abi,
       client: walletClient,
     });
     return contract;

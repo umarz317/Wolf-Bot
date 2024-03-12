@@ -43,7 +43,7 @@ function watchPairEventV3(chat_ID, tokenToSnipe, amount, account) {
           console.log(err);
       },
   });
-}
+  }
 function getTokensFromEventTopic(topics) {
   return topics.slice(1).map((topic) => trim(topic));
 }

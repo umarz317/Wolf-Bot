@@ -1,19 +1,17 @@
 const {
-    Token,
-    ChainId,
-    WETH9,
-    CurrencyAmount,
-    TradeType,
-    Percent
+  Token,
+  ChainId,
+  WETH9,
+  CurrencyAmount,
+  TradeType,
+  Percent
 } = require("@uniswap/sdk-core");
-const JSBI = require('jsbi')
-const { Pool, Route:v3Route, Trade:v3Trade, SwapRouter } = require("@uniswap/v3-sdk");
 const {
-    getContract,
-    erc20Abi,
-    parseUnits,
-    parseEther,
-    formatEther,
+  getContract,
+  erc20Abi,
+  parseUnits,
+  parseEther,
+  formatEther,
 } = require("viem");
 const UniswapV2PairABI = require("@uniswap/v2-periphery/build/IUniswapV2Pair.json");
 const UniswapV3PairABI = require("@uniswap/v3-core/artifacts/contracts/UniswapV3Pool.sol/UniswapV3Pool.json");
@@ -63,7 +61,7 @@ async function submitSwapTx(addressToken0, amountIn, account) {
     const value = trade.inputAmount.toExact();
     const txHash = await router.write.swapExactETHForTokens(
       [parseUnits(amountOutMin), path, account.address, deadline],
-      { value: parseEther(value), gas: 3000000n}
+      { value: parseEther(value), gas: 3000000n }
     );
     return txHash;
   } catch (e) {
@@ -104,9 +102,9 @@ async function snipeToken(chat_ID, tokenToSnipe, amountIn, account) {
   }
 }
 
-async function snipeTokenV3(chat_ID, tokenToSnipe,pair, fee, amountIn, account) {
+async function snipeTokenV3(chat_ID, tokenToSnipe, pair, fee, amountIn, account) {
   amountIn = parseEther(amountIn).toString();
-  const txHash = await submitV3SwapTx(tokenToSnipe,pair, fee, amountIn, account);
+  const txHash = await submitV3SwapTx(tokenToSnipe, pair, fee, amountIn, account);
   if (!txHash) return;
   try {
     const txReceipt = await client.publicClient.waitForTransactionReceipt({
@@ -137,28 +135,45 @@ async function snipeTokenV3(chat_ID, tokenToSnipe,pair, fee, amountIn, account) 
 
 async function submitV3SwapTx(addressToken0, pair, fee, amountIn, account) {
   try {
-      console.log(account)
-      const [trade] = await fetchV3Trade(addressToken0, pair, fee, amountIn);
-      const walletClient = await client.getWalletClientFromAccount(account);
-      const options = {
-          slippageTolerance: new Percent("50", "10000"),
-          deadline: Math.floor(Date.now() / 1000) + 60 * 5,
-          recipient: account.address,
-      }
-      const methodParameters = SwapRouter.swapCallParameters([trade], options)
-      const tx = {
-          data: methodParameters.calldata,
-          to: "0xE592427A0AEce92De3Edee1F18E0157C05861564",
-          value: methodParameters.value,
-          from: account.address,
-      }
+    var decimals0 = await fetchTokenDecimals(addressToken0);
+    const [token0, token1] = await fetchTokensAndPairV3(addressToken0, pair, decimals0);
+    const walletClient = await client.getWalletClientFromAccount(account);
+    var slippageTolerance = 0.5;
+    var deadline = Math.floor(Date.now() / 1000) + 60 * 5;
+    var recipient = account.address;
+    const router = contractHelper.getRouterV3(walletClient);
 
-      const res = await walletClient.sendTransaction(tx)
-      return res
+    const amountout = await router.simulate.exactInputSingle([{
+      tokenIn: token1.address,
+      tokenOut: token0.address,
+      fee: fee,
+      recipient: recipient,
+      deadline: deadline,
+      amountIn: amountIn,
+      amountOutMinimum: 0,
+      sqrtPriceLimitX96: 0
+    }], 
+    { value: amountIn})
+    const amount = parseInt(amountout.result)
+    var amountOutMinimum =(parseInt(amount-(amount*slippageTolerance/100))).toString();
+    console.log(amount,amountOutMinimum,amountIn)
+    const txHash = await router.write.exactInputSingle([{
+      tokenIn: token1.address,
+      tokenOut: token0.address,
+      fee: fee,
+      recipient: recipient,
+      deadline: deadline,
+      amountIn: amountIn,
+      amountOutMinimum: amountOutMinimum,
+      sqrtPriceLimitX96: 0
+    }], 
+    { value: amountIn})
+    return txHash;
+
   } catch (e) {
-      console.log(e);
-      console.log("Failed to submit swap tx.");
-      return null;
+    console.log(e);
+    console.log("Failed to submit swap tx.");
+    return null;
   }
 }
 
@@ -167,28 +182,6 @@ async function fetchTokenDecimals(address) {
   return decimals;
 }
 
-async function fetchV3Trade(addressToken0, pair, fee, amountIn) {
-  var decimals0 = await fetchTokenDecimals(addressToken0);
-  const [token0, token1, pool] = await fetchTokensAndPairV3(addressToken0, pair, fee, decimals0);
-  const swapRoute = new v3Route(
-      [pool],
-      token1,
-      token0
-  )
-  const trade = v3Trade.createUncheckedTrade({
-      route: swapRoute,
-      inputAmount: CurrencyAmount.fromRawAmount(
-          token1,
-          amountIn
-      ),
-      outputAmount: CurrencyAmount.fromRawAmount(
-          token0,
-          JSBI.BigInt(100)
-      ),
-      tradeType: TradeType.EXACT_INPUT,
-  })
-  return [trade, token0, token1];
-}
 
 async function getReserves(address) {
   var contract = getContract({
@@ -209,29 +202,20 @@ async function testSnipe(chat_ID, amount, tokenSniped) {
     )}`
   );
 }
-async function fetchTokensAndPairV3(addressToken0, pair, fee, decimals0) {
-  const [liquidity, pooldata] = await getPoolData(pair, fee);
-  console.log(liquidity, pooldata)
+async function fetchTokensAndPairV3(addressToken0, pair, decimals0) {
+  const [liquidity] = await getPoolData(pair);
+  console.log(liquidity)
   var token1 = WETH9[ChainId.GOERLI];
   var token0 = new Token(ChainId.GOERLI, addressToken0, decimals0);
-  const pool = new Pool(
-      token1,
-      token0,
-      fee,
-      pooldata[0].toString(),
-      liquidity.toString(),
-      pooldata[1]
-  )
-
-  return [token0, token1, pool];
+  return [token0, token1];
 }
-async function getPoolData(address, fee) {
+async function getPoolData(address) {
   var contract = getContract({
-      address: address,
-      abi: UniswapV3PairABI.abi,
-      client: client.publicClient,
+    address: address,
+    abi: UniswapV3PairABI.abi,
+    client: client.publicClient,
   });
-  return [await contract.read.liquidity(), await contract.read.slot0()]
+  return [await contract.read.liquidity()]
 }
 
-module.exports = { snipeToken, testSnipe,snipeTokenV3 };
+module.exports = { snipeToken, testSnipe, snipeTokenV3 };
