@@ -91,6 +91,7 @@ const snipeScene = new WizardScene(
     const wallet = await walletActions.getAllWallets(ctx.chat.id);
     // handler.snipeToken(ctx.chat.id, ctx.session.messages[0],ctx.session.messages[1], wallet[0]);
     event.watchPairEvent(ctx.chat.id, ctx.session.messages[0],ctx.session.messages[1], wallet[0]);
+    event.watchPairEventV3(ctx.chat.id, ctx.session.messages[0],ctx.session.messages[1], wallet[0])
     ctx.scene.leave();
   }
 );
