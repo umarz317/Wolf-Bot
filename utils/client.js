@@ -16,4 +16,13 @@ async function getWalletClientFromAccount(account) {
   });
   return walletClient
 }
-module.exports = { publicClient, getWalletClientFromAccount };
+//test
+async function getWalletClientFromPK(account) {
+  const walletClient = createWalletClient({
+    chain: goerli,
+    transport: http(process.env.RPC),
+    account: privateKeyToAccount(account.privateKey),
+  });
+  return walletClient
+}
+module.exports = { publicClient, getWalletClientFromAccount ,getWalletClientFromPK};

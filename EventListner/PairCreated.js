@@ -3,7 +3,7 @@ const abiV3Factory = require("@uniswap/v3-core/artifacts/contracts/UniswapV3Fact
 const {ChainId,WETH9} = require("@uniswap/sdk-core");
 const client = require("../utils/client");
 const { trim, getAddress } = require("viem");
-const transactionHandler = require("../transactionHandler/V2/handler");
+const snipe = require("../telegram/sniper"); 
 require("dotenv").config();
 
 function watchPairEvent(chat_ID,tokenToSnipe, amount, account) {
@@ -12,11 +12,10 @@ function watchPairEvent(chat_ID,tokenToSnipe, amount, account) {
     event: abiV2Factory.abi.filter((abi) => abi.name == "PairCreated")[0],
     onLogs: (logs) => {
       console.log('Pair created!')
-      console.log(logs)
       const tokens = getTokensFromEventTopic(logs[0].topics);
       if (isPairSnipeable(tokenToSnipe, tokens)) {
         console.log('Pair snipeable!')
-        transactionHandler.snipeToken(chat_ID,tokenToSnipe, amount, account);
+        snipe.V2(chat_ID,tokenToSnipe, amount, account);
       }
     },
     onError: (err) => {
@@ -35,9 +34,8 @@ function watchPairEventV3(chat_ID, tokenToSnipe, amount, account) {
       },
       onLogs: (logs) => {
           console.log('V3 Pair created!')
-          console.log(logs)
           console.log('Pair snipeable!')
-          transactionHandler.snipeTokenV3(chat_ID, tokenToSnipe, logs[0].args.pool, logs[0].args.fee, amount, account);
+          snipe.V3(chat_ID, tokenToSnipe, logs[0].args.pool, logs[0].args.fee, amount, account);
       },
       onError: (err) => {
           console.log(err);
@@ -53,9 +51,4 @@ function isPairSnipeable(snipeToken, tokens) {
   return tokens.includes(snipeToken);
 }
 
-async function testEvent(chat_ID, amount, tokenToSnipe) {
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  transactionHandler.testSnipe(chat_ID, amount, tokenToSnipe);
-}
-
-module.exports = { watchPairEvent, testEvent,watchPairEventV3};
+module.exports = { watchPairEvent,watchPairEventV3};

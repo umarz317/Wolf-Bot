@@ -2,8 +2,8 @@ const { Markup, Scenes } = require("telegraf");
 const { WizardScene } = Scenes;
 const walletActions  = require("../utils/walletActions");
 const helpers = require("../utils/helpers");
+const snipe = require("../telegram/sniper");
 const event = require("../EventListner/PairCreated");
-const handler = require("../transactionHandler/V2/handler");
 
 const importWalletScene = new WizardScene(
   "import-wallet",
@@ -69,7 +69,6 @@ const snipeScene = new WizardScene(
     await new Promise((resolve) => setTimeout(resolve, 1000));
     ctx.session.messages = [token];
     ctx.wizard.next();
-    console.log('here')
     ctx.message.text = null;
     return ctx.wizard.steps[ctx.wizard.cursor](ctx);
   },
@@ -87,11 +86,12 @@ const snipeScene = new WizardScene(
       return;
     }
     ctx.reply("✅ Snipe setup complete, We'll snipe the token and update you.");
-    //improve this.... make snipe file handling snipe(watch and submit tx)
+
     const wallet = await walletActions.getAllWallets(ctx.chat.id);
-    // handler.snipeToken(ctx.chat.id, ctx.session.messages[0],ctx.session.messages[1], wallet[0]);
-    event.watchPairEvent(ctx.chat.id, ctx.session.messages[0],ctx.session.messages[1], wallet[0]);
-    event.watchPairEventV3(ctx.chat.id, ctx.session.messages[0],ctx.session.messages[1], wallet[0])
+    //test
+    snipe.V3(ctx.chat.id, ctx.session.messages[0],"0xe90d9a3e765a221bc1a697a1a3b0bb2e8e8c5e78",3000,ctx.session.messages[1], wallet[0]);
+    // event.watchPairEvent(ctx.chat.id, ctx.session.messages[0],ctx.session.messages[1], wallet[0]);
+    // event.watchPairEventV3(ctx.chat.id, ctx.session.messages[0],ctx.session.messages[1], wallet[0])
     ctx.scene.leave();
   }
 );

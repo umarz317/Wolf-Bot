@@ -1,8 +1,7 @@
 const { isAddress } = require("viem");
-const client = require("./client");
-const { Contract } = require("ethers");
 const contractHelper = require("./contractHelper");
 const { bot } = require("../telegram/bot");
+const { privateKeyToAddress } = require("viem/accounts");
 
 function isValidPrivateKey(pk) {
   if (!pk.startsWith("0x")) {
@@ -12,6 +11,7 @@ function isValidPrivateKey(pk) {
     privateKeyToAddress(pk);
     return true;
   } catch (error) {
+    console.log(error);
     return false;
   }
 }
@@ -40,4 +40,9 @@ function sendMessage(chatID, message) {
   bot.telegram.sendMessage(chatID, message);
 }
 
-module.exports = { isValidPrivateKey, isValidAddress, isERC20, sendMessage };
+async function fetchTokenDecimals(address) {
+  var decimals = await contractHelper.getToken(address).read.decimals();
+  return decimals;
+}
+
+module.exports = { isValidPrivateKey, isValidAddress, isERC20, sendMessage,fetchTokenDecimals };
