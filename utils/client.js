@@ -5,12 +5,12 @@ require("dotenv").config();
 const keyManagement = require('./keyManagement')
 
 const publicClient = createPublicClient({
-  chain: goerli,
+  chain: sepolia,
   transport: http(process.env.RPC),
 });
 async function getWalletClientFromAccount(account) {
   const walletClient = createWalletClient({
-    chain: goerli,
+    chain: sepolia,
     transport: http(process.env.RPC),
     account: privateKeyToAccount(keyManagement.decrypt(account.privateKey)),
   });
@@ -19,7 +19,7 @@ async function getWalletClientFromAccount(account) {
 //test
 async function getWalletClientFromPK(account) {
   const walletClient = createWalletClient({
-    chain: goerli,
+    chain: sepolia,
     transport: http(process.env.RPC),
     account: privateKeyToAccount(account.privateKey),
   });

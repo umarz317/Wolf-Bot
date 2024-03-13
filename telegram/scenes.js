@@ -89,7 +89,7 @@ const snipeScene = new WizardScene(
 
     const wallet = await walletActions.getAllWallets(ctx.chat.id);
     //test
-    snipe.V3(ctx.chat.id, ctx.session.messages[0],"0xe90d9a3e765a221bc1a697a1a3b0bb2e8e8c5e78",3000,ctx.session.messages[1], wallet[0]);
+    snipe.V3(ctx.chat.id, ctx.session.messages[0],"0x441a5e1666229b65c655b323bc5128ba1fd44e59",500,ctx.session.messages[1], wallet[1]);
     // event.watchPairEvent(ctx.chat.id, ctx.session.messages[0],ctx.session.messages[1], wallet[0]);
     // event.watchPairEventV3(ctx.chat.id, ctx.session.messages[0],ctx.session.messages[1], wallet[0])
     ctx.scene.leave();

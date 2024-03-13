@@ -1,7 +1,7 @@
 const { getContract, erc20Abi } = require("viem");
 const client = require("./client");
 const uniswapV2RouterABI = require("@uniswap/v2-periphery/build/IUniswapV2Router02.json");
-const V3SwapRouterABI  = require('@uniswap/v3-periphery/artifacts/contracts/SwapRouter.sol/SwapRouter.json')
+const V3SwapRouterABI  = require('@uniswap/swap-router-contracts/artifacts/contracts/SwapRouter02.sol/SwapRouter02.json')
 module.exports = {
   getToken: (address) => {
     var contract = getContract({

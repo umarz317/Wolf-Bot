@@ -24,7 +24,7 @@ function watchPairEvent(chat_ID,tokenToSnipe, amount, account) {
   });
 }
 function watchPairEventV3(chat_ID, tokenToSnipe, amount, account) {
-  const weth = WETH9[ChainId.GOERLI].address
+  const weth = WETH9[ChainId.SEPOLIA].address
   client.publicClient.watchEvent({
       address: process.env.V3_FACTORY,
       event: abiV3Factory.abi.filter((abi) => abi.name == "PoolCreated")[0],
