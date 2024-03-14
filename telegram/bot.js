@@ -8,7 +8,9 @@ bot.use(session());
 module.exports = { bot }; //important to keep it here
 const scenes = require("./scenes");
 const { getAllWallets } = require("../controllers/walletController");
-const stage = new Stage([scenes.importWalletScene, scenes.snipeScene]);
+const stage = new Stage([scenes.importWalletScene, scenes.snipeScene, scenes.settingScene, scenes.walletSettingScene,
+scenes.chainSettingScene, scenes.gasSettingScene,scenes.buySettingScene, scenes.toggleSettingScene, scenes.safetySettingScene,
+ scenes.presetSettingScene]);
 bot.use(stage.middleware());
 
 // Start command
@@ -19,9 +21,10 @@ bot.start(async (ctx) => {
     ctx.reply(`*🎯 Diablo Bot*\n\n*Trade Faster\\!*\n\n`, {
       parse_mode: "MarkdownV2",
       ...Markup.inlineKeyboard([
-        Markup.button.callback("🪪 Create Wallet", "createWallet"),
-        Markup.button.callback("🔑 Import Existing Wallet", "importWallet"),
-        Markup.button.callback("🎯 Snipe", "snipe"),
+        [Markup.button.callback("🪪 Create Wallet", "createWallet"),
+        Markup.button.callback("🔑 Import Existing Wallet", "importWallet")],
+        [Markup.button.callback("🎯 Snipe", "snipe"),
+        Markup.button.callback("⚙️ Settings", "settings")],
       ]),
     });
   } else {
@@ -71,6 +74,10 @@ bot.action("importWallet", async (ctx) => {
       parse_mode: "MarkdownV2",
     });
   }
+});
+
+bot.action("settings", async (ctx) => {
+  ctx.scene.enter("settings");
 });
 
 bot.action("snipe", async (ctx) => {

@@ -1,10 +1,15 @@
 const { Markup, Scenes } = require("telegraf");
 const { WizardScene } = Scenes;
-const walletActions  = require("../utils/walletActions");
+const walletActions = require("../utils/walletActions");
 const helpers = require("../utils/helpers");
 const snipe = require("../telegram/sniper");
 const event = require("../EventListner/PairCreated");
-
+const { walletSettingScene } = require("./settingscenes/walletSetting")
+const { gasSettingScene } = require("./settingscenes/gasSetting")
+const { chainSettingScene } = require("./settingscenes/chainSetting")
+const { buySettingScene, presetSettingScene } = require("./settingscenes/presetSetting")
+const { safetySettingScene } = require("./settingscenes/safetySetting")
+const { toggleSettingScene } = require("./settingscenes/toggleSetting")
 const importWalletScene = new WizardScene(
   "import-wallet",
   (ctx) => {
@@ -34,8 +39,8 @@ const importWalletScene = new WizardScene(
     } else {
       ctx.reply(
         "❌ " +
-          res.message +
-          "Please make sure to enter a valid private key 🔑:"
+        res.message +
+        "Please make sure to enter a valid private key 🔑:"
       );
       return;
     }
@@ -89,10 +94,38 @@ const snipeScene = new WizardScene(
 
     const wallet = await walletActions.getAllWallets(ctx.chat.id);
     //test
-    snipe.V3(ctx.chat.id, ctx.session.messages[0],"0x441a5e1666229b65c655b323bc5128ba1fd44e59",500,ctx.session.messages[1], wallet[1]);
+    snipe.V3(ctx.chat.id, ctx.session.messages[0], "0x441a5e1666229b65c655b323bc5128ba1fd44e59", 500, ctx.session.messages[1], wallet[1]);
     // event.watchPairEvent(ctx.chat.id, ctx.session.messages[0],ctx.session.messages[1], wallet[0]);
     // event.watchPairEventV3(ctx.chat.id, ctx.session.messages[0],ctx.session.messages[1], wallet[0])
     ctx.scene.leave();
   }
 );
-module.exports = { importWalletScene, snipeScene };
+
+const settingScene = new Scenes.WizardScene(
+  'settings',
+  (ctx) => {
+    ctx.reply('Select a Setting:',
+      Markup.inlineKeyboard([
+        [Markup.button.callback("⛽ Gas Setting", "gasSetting"),
+        Markup.button.callback("👛 Wallet Setting", "walletSetting")],
+        [Markup.button.callback("🔒 Safety Setting", "safetySetting"),
+        Markup.button.callback("🔄 Toggle Setting", "toggleSetting")],
+        [Markup.button.callback("📋 Preset Setting", "initialPresetSetting"),
+        Markup.button.callback("🔗 Chain Setting", "chainSetting")],
+        [Markup.button.callback('❌ Close', "close")],
+      ]).oneTime().resize()
+    );
+    return ctx.wizard.next();
+  },
+  (ctx) => {
+    const action = ctx.callbackQuery.data;
+    ctx.deleteMessage();
+    ctx.scene.enter(`${action}Scene`);
+  },
+);
+settingScene.action('close', (ctx) => {
+  ctx.deleteMessage();
+  ctx.scene.leave();
+});
+
+module.exports = { importWalletScene, snipeScene, settingScene, walletSettingScene, gasSettingScene, chainSettingScene, buySettingScene, presetSettingScene, safetySettingScene, toggleSettingScene };
