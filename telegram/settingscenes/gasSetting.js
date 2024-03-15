@@ -1,6 +1,7 @@
 const { Markup, Scenes } = require("telegraf");
-const gasSettingScene = new Scenes.BaseScene('gasSettingScene');
+const {onMessage,onSelectingOption} = require("../helpers")
 
+const gasSettingScene = new Scenes.BaseScene('gasSettingScene');
 gasSettingScene.enter((ctx) => {
   ctx.reply('Gas Setting Options:',
     Markup.inlineKeyboard([
@@ -17,8 +18,33 @@ gasSettingScene.enter((ctx) => {
     ])
   );
 });
+
+const gasSettingsOptions = {
+  'autoSnipeTip': { format: '"0.1"', unit: 'ETH', min: 0.001, defaultValue: 0.01 },
+  'firstBundleBackupTip': { format: '"0.1"', unit: 'ETH', min: 0.001, defaultValue: 0.01 },
+  'buyGwei': { format: '"10"', unit: 'Gwei', min: 1, defaultValue: 15 },
+  'approveGwei': { format: '"10"', unit: 'Gwei', min: 5, defaultValue: 10 },
+  'sellGwei': { format: '"10"', unit: 'Gwei', min: 1, defaultValue: 15 },
+  'antiRugGwei': { format: '"10"', unit: 'Gwei', min: 10, defaultValue: 0 },
+  'gasLimit': { format: '"300000"', unit: '', min: 3000000, defaultValue: 3000000 },
+  'buyLimitOrderGwei': { format: '"10"', unit: 'Gwei', min: 0, defaultValue: 10 },
+  'mempoolGweiLimit': { format: '"10"', unit: 'Gwei', min: 0, defaultValue: 0 },
+};
+
+Object.keys(gasSettingsOptions).forEach(option => {
+  gasSettingScene.action(option, async (ctx) => {
+    onSelectingOption(ctx,option,gasSettingsOptions)
+  });
+});
+
+gasSettingScene.on('message', (ctx) => {
+  onMessage(ctx,gasSettingsOptions);
+});
+
 gasSettingScene.action('back', (ctx) => {
   ctx.deleteMessage()
-  ctx.scene.enter('settings')});
+  ctx.scene.enter('settings')
+});
 gasSettingScene.action('close', (ctx) => ctx.deleteMessage());
-module.exports = {gasSettingScene};
+
+module.exports = { gasSettingScene };

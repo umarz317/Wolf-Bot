@@ -1,5 +1,6 @@
 const { Markup, Scenes } = require("telegraf");
 const safetySettingScene = new Scenes.BaseScene('safetySettingScene');
+const {onMessage,onSelectingOption} = require("../helpers")
 
 safetySettingScene.enter((ctx) => {
   ctx.reply('Safety Setting Options:',
@@ -9,24 +10,30 @@ safetySettingScene.enter((ctx) => {
       [Markup.button.callback('🔀 Slippage', 'slippage')],
       [Markup.button.callback('💧 Min Liquidity Limit', 'minLiquidityLimit')],
       [Markup.button.callback('🌊 Max Liquidity Limit', 'maxLiquidityLimit')],
-      [Markup.button.callback('🔙 Back', 'back')],
-      [Markup.button.callback('❌ Close', 'close')],
+      [Markup.button.callback('🔙 Back', 'back'),
+      Markup.button.callback('❌ Close', 'close')],
     ])
   );
 });
 
-  safetySettingScene.action('buyTaxLimit', (ctx) => {
-    ctx.reply('Please enter the value :');
-    ctx.session.nextAction = option;  
-  });
+const safetySettingsOptions = {
+  'buyTaxLimit': { format: '"0"', unit: '%', min: 0, defaultValue: 50 },
+  'sellTaxLimit': { format: '"0"', unit: '%', min: 0, defaultValue: 50 },
+  'slippage': { format: '"10"', unit: '%', min: 0.01, defaultValue: 15 },
+  'minLiquidityLimit': { format: 'USD "0"', unit: '%', min: 5000, defaultValue: '' },
+  'maxLiquidityLimit': { format: '"10"', unit: '%', min: '', defaultValue:'' },
+};
 
-safetySettingScene.on('text', async (ctx) => {
-  if (ctx.session.nextAction) {
-    const userInput = ctx.message.text;
-    ctx.reply(`set to ${userInput}.`);
-    ctx.session.nextAction = null; 
-  }
+Object.keys(safetySettingsOptions).forEach(option => {
+  safetySettingScene.action(option, async (ctx) => {
+    onSelectingOption(ctx,option,safetySettingsOptions)
+  });
 });
+
+safetySettingScene.on('message', (ctx) => {
+  onMessage(ctx,safetySettingsOptions);
+});
+
 
 safetySettingScene.action('back', (ctx) => {ctx.deleteMessage()
   ctx.scene.enter('settings')});

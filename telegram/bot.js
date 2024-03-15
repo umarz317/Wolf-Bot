@@ -86,9 +86,7 @@ bot.action("snipe", async (ctx) => {
 });
 
 bot.action("cancelImport", (ctx) => {
-  ctx.reply(
-    "Operation canceled. Feel free to start over or use other commands."
-  );
+  ctx.deleteMessage()
   return ctx.scene.leave();
 });
 

@@ -21,10 +21,8 @@ const importWalletScene = new WizardScene(
   },
   async (ctx) => {
     if (!ctx.message) {
-      ctx.reply(
-        "Operation canceled. Feel free to start over or use other commands."
-      );
-      return ctx.scene.leave();
+      ctx.deleteMessage()
+      return ctx.scene.current.leave();
     }
     const pk = ctx.message.text;
     if (!helpers.isValidPrivateKey(pk)) {
@@ -118,9 +116,10 @@ const settingScene = new Scenes.WizardScene(
     return ctx.wizard.next();
   },
   (ctx) => {
+    if(ctx.callbackQuery){
     const action = ctx.callbackQuery.data;
     ctx.deleteMessage();
-    ctx.scene.enter(`${action}Scene`);
+    ctx.scene.enter(`${action}Scene`);}
   },
 );
 settingScene.action('close', (ctx) => {
