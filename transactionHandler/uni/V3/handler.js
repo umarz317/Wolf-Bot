@@ -1,9 +1,9 @@
 const { Token, ChainId, WETH9 } = require("@uniswap/sdk-core");
 const { getContract, parseEther, formatEther, parseGwei } = require("viem");
 const UniswapV3PairABI = require("@uniswap/v3-core/artifacts/contracts/UniswapV3Pool.sol/UniswapV3Pool.json");
-const client = require("../../utils/client");
-const contractHelper = require("../../utils/contractHelper");
-const helper = require("../../utils/helpers");
+const client = require("../../../utils/client");
+const contractHelper = require("../../../utils/contractHelper");
+const helper = require("../../../utils/helpers");
 
 async function submitSwapTxV3(addressToken0, pair, fee, amountIn, account) {
   try {

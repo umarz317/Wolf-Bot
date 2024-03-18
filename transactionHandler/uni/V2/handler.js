@@ -12,10 +12,10 @@ const {
   parseEther,
 } = require("viem");
 const UniswapV2PairABI = require("@uniswap/v2-periphery/build/IUniswapV2Pair.json");
-const client = require("../../utils/client");
+const client = require("../../../utils/client");
 const { Pair, Route, Trade } = require("@uniswap/v2-sdk");
-const contractHelper = require("../../utils/contractHelper");
-const helper = require("../../utils/helpers");
+const contractHelper = require("../../../utils/contractHelper");
+const helper = require("../../../utils/helpers");
 
 async function fetchTokensAndPair(addressToken0) {
   var decimals0 = await helper.fetchTokenDecimals(addressToken0);

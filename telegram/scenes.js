@@ -91,8 +91,10 @@ const snipeScene = new WizardScene(
     ctx.reply("✅ Snipe setup complete, We'll snipe the token and update you.");
 
     const wallet = await walletActions.getAllWallets(ctx.chat.id);
+    console.log(wallet)
     //test
-    snipe.V3(ctx.chat.id, ctx.session.messages[0], "0x441a5e1666229b65c655b323bc5128ba1fd44e59", 500, ctx.session.messages[1], wallet[1]);
+    // snipe.V3(ctx.chat.id, ctx.session.messages[0], "0x441a5e1666229b65c655b323bc5128ba1fd44e59", 500, ctx.session.messages[1], wallet[1]);
+    snipe.sushiV2(ctx.chat.id, ctx.session.messages[0], "0x55ff76bffc3cdd9d5fdbbc2ece4528ecce45047e", ctx.session.messages[1], wallet[0]);
     // event.watchPairEvent(ctx.chat.id, ctx.session.messages[0],ctx.session.messages[1], wallet[0]);
     // event.watchPairEventV3(ctx.chat.id, ctx.session.messages[0],ctx.session.messages[1], wallet[0])
     ctx.scene.leave();

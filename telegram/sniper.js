@@ -52,11 +52,54 @@ module.exports = {
     );
     if (!txHash) return;
     try {
-      console.log("Waiting for receipt.")
+      console.log("Waiting for receipt.");
       const txReceipt = await client.publicClient.waitForTransactionReceipt({
         hash: txHash,
       });
-      console.log("Got receipt.")
+      console.log("Got receipt.");
+      if (txReceipt.status === "success") {
+        console.log("Transaction successful.");
+        bot.telegram.sendMessage(
+          chat_ID,
+          `✅ Snipe Successful\n\n🎯 Token: ${tokenToSnipe}\n\n💰 Amount: ${formatEther(
+            amountIn
+          )}`
+        );
+      } else {
+        console.log("Transaction failed.");
+        bot.telegram.sendMessage(
+          chat_ID,
+          `❌ Snipe Failed\n\n🎯 Token: ${tokenToSnipe}\n\n💰 Amount: ${formatEther(
+            amountIn
+          )}`
+        );
+      }
+    } catch (e) {
+      console.log(e);
+      console.log("Failed to get receipt.");
+    }
+  },
+  sushiV2: async function snipeToken(
+    chat_ID,
+    tokenToSnipe,
+    pair,
+    amountIn,
+    account
+  ) {
+    amountIn = parseEther(amountIn)
+    const txHash = await submitTX.sushiV2(
+      amountIn,
+      pair,
+      tokenToSnipe,
+      account
+    );
+    if (!txHash) return;
+    try {
+      console.log("Waiting for receipt.");
+      const txReceipt = await client.publicClient.waitForTransactionReceipt({
+        hash: txHash,
+      });
+      console.log("Got receipt.");
       if (txReceipt.status === "success") {
         console.log("Transaction successful.");
         bot.telegram.sendMessage(
