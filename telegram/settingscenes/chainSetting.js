@@ -7,7 +7,7 @@ chainSettingScene.enter(async (ctx) => {
   const userId = ctx.from.id;
   const chain = await getSettingValue(userId,"chain")
   ctx.session.selectedChains = chain || {};
-  ctx.reply('Select blockchains (multiple can be selected):', Markup.inlineKeyboard([
+  ctx.reply('Select blockchains :', Markup.inlineKeyboard([
     [Markup.button.callback(`Ethereum ${ctx.session.selectedChains==='ethereum' ? '✅' : ''}`, 'toggle:ethereum')],
     [Markup.button.callback(`BSC ${ctx.session.selectedChains==='bsc' ? '✅' : ''}`, 'toggle:bsc')],
     [Markup.button.callback('🔙 Back', 'back'),

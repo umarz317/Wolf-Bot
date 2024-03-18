@@ -17,11 +17,11 @@ safetySettingScene.enter((ctx) => {
 });
 
 const safetySettingsOptions = {
-  'buyTaxLimit': { format: '"0"', unit: '%', min: 0, defaultValue: 50 },
-  'sellTaxLimit': { format: '"0"', unit: '%', min: 0, defaultValue: 50 },
-  'slippage': { format: '"10"', unit: '%', min: 0.01, defaultValue: 15 },
-  'minLiquidityLimit': { format: 'USD "0"', unit: '%', min: 5000, defaultValue: '' },
-  'maxLiquidityLimit': { format: '"10"', unit: '%', min: '', defaultValue:'' },
+  'buyTaxLimit': { format: '"0"', unit: '%', min: 0, defaultValue: 50 ,name:"Buy Tax Limit"},
+  'sellTaxLimit': { format: '"0"', unit: '%', min: 0, defaultValue: 50,name:"Sell Tax Limit" },
+  'slippage': { format: '"10"', unit: '%', min: 0.01, defaultValue: 15 ,name:"Slippage"},
+  'minLiquidityLimit': { format: 'USD "0"', unit: '%', min: 5000, defaultValue: '' ,name:"Min Liquidity Limit"},
+  'maxLiquidityLimit': { format: '"10"', unit: '%', min: '', defaultValue:'' ,name:"Max Liquidity Limit"},
 };
 
 Object.keys(safetySettingsOptions).forEach(option => {

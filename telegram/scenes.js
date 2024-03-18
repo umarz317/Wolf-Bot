@@ -105,7 +105,7 @@ const settingScene = new Scenes.WizardScene(
     ctx.reply('Select a Setting:',
       Markup.inlineKeyboard([
         [Markup.button.callback("⛽ Gas Setting", "gasSetting"),
-        Markup.button.callback("👛 Wallet Setting", "walletSetting")],
+        Markup.button.callback("💰 Wallet Setting", "walletSetting")],
         [Markup.button.callback("🔒 Safety Setting", "safetySetting"),
         Markup.button.callback("🔄 Toggle Setting", "toggleSetting")],
         [Markup.button.callback("📋 Preset Setting", "initialPresetSetting"),

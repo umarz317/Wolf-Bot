@@ -7,7 +7,6 @@ walletSettingScene.enter((ctx) => {
     Markup.inlineKeyboard([
       [Markup.button.callback('🔧 Wallet Setup', 'walletSetup')],
       [Markup.button.callback('🔐 Default Wallet', 'defaultWallet')],
-      [Markup.button.callback('🌉 Transfer/Bridge Tokens/ETH', 'transferBridgeTokensETH')],
       [Markup.button.callback('🎯 Default Auto Sniper Wallet', 'defaultAutoSniperWallet')],
       [Markup.button.callback('👛 Default Manual Buyer Wallets', 'defaultManualBuyerWallets')],
       [Markup.button.callback('🗑 Delete Wallet', 'deleteWallet')],
@@ -74,9 +73,10 @@ walletSettingScene.enter((ctx) => {
     ctx.reply('Wallet deleted successfully.');
   });
 
-  const walletOptions = ['defaultWallet', 'defaultAutoSniperWallet', 'defaultManualBuyerWallets'];
+  const walletOptions = {'defaultWallet':{name:"Default Wallet"}, 'defaultAutoSniperWallet':{name:"Default Auto Sniper Wallet"},
+   'defaultManualBuyerWallets':{name:"Default Manual Buyer Wallets"}};
 
-walletOptions.forEach(setting => {
+  Object.keys(walletOptions).forEach(setting => {
   walletSettingScene.action(setting, async (ctx) => {
     ctx.deleteMessage()
     const userId = ctx.from.id;
@@ -87,7 +87,7 @@ walletOptions.forEach(setting => {
       const walletButtons = userWallets.wallets.map((wallet, index) =>
         [Markup.button.callback(index === ctx.session.walletsetting ? `✅ ${wallet.address}` : wallet.address, `${setting}:${index}`)]
       );
-      ctx.reply(`Select a wallet for ${setting}:`, Markup.inlineKeyboard(
+      ctx.reply(`Select a wallet for ${walletOptions[setting].name}:`, Markup.inlineKeyboard(
         [...walletButtons,
         [Markup.button.callback('🔙 Back', 'backToWaletSetting'),
         Markup.button.callback('❌ Close', 'close')]
@@ -97,7 +97,7 @@ walletOptions.forEach(setting => {
     }
   });
 });
-walletOptions.forEach(setting => {
+Object.keys(walletOptions).forEach(setting => {
   walletSettingScene.action(new RegExp(`^${setting}:(\\d+)$`), async (ctx) => {
       const walletIndex  = parseInt(ctx.match[1]);
       ctx.session.walletsetting =  ctx.session.walletsetting===walletIndex?-1:walletIndex;

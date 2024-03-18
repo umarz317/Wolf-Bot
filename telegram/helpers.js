@@ -43,24 +43,20 @@ async function updateSetting(userId, settingName, settingValue) {
 
   async function onMessage(ctx,settingsOptions){
     if (ctx.session.nextAction && ctx.message.text && ctx.session.nextAction) {
-      console.log("hii")
       const settingValue = parseFloat(ctx.message.text);
       ctx.session.userMsgId = ctx.msgId;
       const setting = settingsOptions[ctx.session.nextAction];
-      console.log("hiigg")
       if (!isNaN(settingValue) && settingValue >= setting.min) {
         const settingType = ctx.session.nextAction;
         const userId = ctx.from.id;
         ctx.deleteMessage(ctx.session.botMessageId)
         ctx.deleteMessage(ctx.session.userMsgId)
         const { previousValue } = await updateSetting(userId, settingType, settingValue);
-        ctx.reply(`${settingType} Previous Value: ${previousValue?previousValue:setting.defaultValue?setting.defaultValue:"Not Set"} ${setting.unit}.\nNew Value: ${settingValue} ${setting.unit}.`);
+        ctx.reply(`${settingsOptions[settingType].name} Previous Value: ${previousValue?previousValue:setting.defaultValue+" "+setting.unit?setting.defaultValue:"Not Set"}.\nNew Value: ${settingValue} ${setting.unit}.`);
         ctx.session.nextAction = null;
         ctx.session.botMessageId = null;
         ctx.session.userMsgId = null;
       } else {
-        console.log("hihhhi")
-        console.log(ctx.session.botMessageId,ctx.session.userMsgId)
         ctx.deleteMessage(ctx.session.botMessageId)
         ctx.deleteMessage(ctx.session.userMsgId)
         const message = await ctx.reply(`Invalid input. Please enter a value atleat ${setting.min}.`);
@@ -75,9 +71,9 @@ async function updateSetting(userId, settingName, settingValue) {
     let sentMessage
     const value = await getSettingValue(ctx.from.id, option);
     if (value)
-      sentMessage = await ctx.reply(`Current value: ${value}.\nEnter the value for ${option} in format: ${settingsOptions[option].format}.`);
+      sentMessage = await ctx.reply(`Current value: ${value}.\nEnter the value for ${settingsOptions[option].name} in format: ${settingsOptions[option].format}.`);
     else
-      sentMessage = await ctx.reply(`Current value:${settingsOptions[option].defaultValue}. \nEnter the value for ${option} in format: ${settingsOptions[option].format}.`);
+      sentMessage = await ctx.reply(`Current value:${settingsOptions[option].defaultValue}. \nEnter the value for ${settingsOptions[option].name} in format: ${settingsOptions[option].format}.`);
     const id = sentMessage.message_id;
     ctx.session.botMessageId = id;
     ctx.session.nextAction = option;

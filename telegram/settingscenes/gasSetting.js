@@ -20,15 +20,15 @@ gasSettingScene.enter((ctx) => {
 });
 
 const gasSettingsOptions = {
-  'autoSnipeTip': { format: '"0.1"', unit: 'ETH', min: 0.001, defaultValue: 0.01 },
-  'firstBundleBackupTip': { format: '"0.1"', unit: 'ETH', min: 0.001, defaultValue: 0.01 },
-  'buyGwei': { format: '"10"', unit: 'Gwei', min: 1, defaultValue: 15 },
-  'approveGwei': { format: '"10"', unit: 'Gwei', min: 5, defaultValue: 10 },
-  'sellGwei': { format: '"10"', unit: 'Gwei', min: 1, defaultValue: 15 },
-  'antiRugGwei': { format: '"10"', unit: 'Gwei', min: 10, defaultValue: 0 },
-  'gasLimit': { format: '"300000"', unit: '', min: 3000000, defaultValue: 3000000 },
-  'buyLimitOrderGwei': { format: '"10"', unit: 'Gwei', min: 0, defaultValue: 10 },
-  'mempoolGweiLimit': { format: '"10"', unit: 'Gwei', min: 0, defaultValue: 0 },
+  'autoSnipeTip': { format: '"0.1"', unit: 'ETH', min: 0.001, defaultValue: 0.01 ,name:"Auto Snipe Tip"},
+  'firstBundleBackupTip': { format: '"0.1"', unit: 'ETH', min: 0.001, defaultValue: 0.01,name:"First Bundle Backup Tip" },
+  'buyGwei': { format: '"10"', unit: 'Gwei', min: 1, defaultValue: 15,name:"Buy Gwei" },
+  'approveGwei': { format: '"10"', unit: 'Gwei', min: 5, defaultValue: 10,name:"Approve Gwei" },
+  'sellGwei': { format: '"10"', unit: 'Gwei', min: 1, defaultValue: 15 ,name:"Sell Gwei"},
+  'antiRugGwei': { format: '"10"', unit: 'Gwei', min: 10, defaultValue: 0 ,name:"Anti Rug Gwei"},
+  'gasLimit': { format: '"300000"', unit: '', min: 3000000, defaultValue: 3000000 ,name:"Gas Limit" },
+  'buyLimitOrderGwei': { format: '"10"', unit: 'Gwei', min: 0, defaultValue: 10 ,name:"Buy Limit Order Gwei"},
+  'mempoolGweiLimit': { format: '"10"', unit: 'Gwei', min: 0, defaultValue: 0,name:"Mempool Gwei Limit" },
 };
 
 Object.keys(gasSettingsOptions).forEach(option => {
