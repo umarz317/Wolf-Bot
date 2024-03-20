@@ -1,7 +1,7 @@
 const express = require("express");
 const bot = require("./telegram/bot");
 const app = express();
-const status = false
+var status = false
 require("./config/db");
 
 app.listen(8080, () => {
