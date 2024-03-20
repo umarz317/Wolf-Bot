@@ -3,7 +3,7 @@ const { Telegraf, Markup, Scenes, session } = require("telegraf");
 const { Stage } = Scenes;
 const walletActions = require("../utils/walletActions");
 const bot = new Telegraf(process.env.BOT_TOKEN);
-console.log("bot....start");
+
 bot.use(session());
 module.exports = { bot }; //important to keep it here
 const scenes = require("./scenes");
@@ -111,9 +111,10 @@ bot.action("cancelImport", (ctx) => {
 function start() {
   try {
     bot.launch();
+    console.log("Bot Started...")
   } catch {
     console.log("Error Launching Bot!");
   }
-};
+}
 
-module.exports = {start}
+module.exports = { start };
