@@ -108,10 +108,12 @@ bot.action("cancelImport", (ctx) => {
   return ctx.scene.leave();
 });
 
-module.exports = function start() {
+function start() {
   try {
     bot.launch();
   } catch {
     console.log("Error Launching Bot!");
   }
 };
+
+module.exports = {start}
