@@ -1,13 +1,21 @@
 const express = require("express");
 const bot = require("./telegram/bot");
 const app = express();
+const status = false
 require("./config/db");
 
 app.listen(3000, () => {
   console.log("server started");
-  bot.start()
 });
 
 app.get("/", (req, res) => {
-  res.send("Diablo Running!");
+  res.send("Diablo Running!"+status);
+})
+
+app.get("/start",(req,res)=>{
+  if(status===false){
+    status=true
+    bot.start();
+  }
+  res.send("1")
 })
