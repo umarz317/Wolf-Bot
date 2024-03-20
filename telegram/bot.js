@@ -7,23 +7,38 @@ console.log("bot....start");
 bot.use(session());
 module.exports = { bot }; //important to keep it here
 const scenes = require("./scenes");
-const stage = new Stage([scenes.importWalletScene, scenes.snipeScene, scenes.settingScene, scenes.walletSettingScene,
-scenes.chainSettingScene, scenes.gasSettingScene,scenes.buySettingScene, scenes.toggleSettingScene, scenes.safetySettingScene,
- scenes.presetSettingScene,scenes.manualBuyScene]);
+const stage = new Stage([
+  scenes.importWalletScene,
+  scenes.snipeScene,
+  scenes.settingScene,
+  scenes.walletSettingScene,
+  scenes.chainSettingScene,
+  scenes.gasSettingScene,
+  scenes.buySettingScene,
+  scenes.toggleSettingScene,
+  scenes.safetySettingScene,
+  scenes.presetSettingScene,
+  scenes.manualBuyScene,
+]);
 bot.use(stage.middleware());
 
 // Start command
 bot.start(async (ctx) => {
-  console.log("Chat ID: ",ctx.chat.id)
+  console.log("Chat ID: ", ctx.chat.id);
   const res = await walletActions.doesWalletExist(ctx.chat.id);
   if (res) {
     ctx.reply(`*🎯 Diablo Bot*\n\n*Trade Faster\\!*\n\n`, {
       parse_mode: "MarkdownV2",
       ...Markup.inlineKeyboard([
-        [Markup.button.callback("🪪 Create Wallet", "createWallet"),
-        Markup.button.callback("🔑 Import Existing Wallet", "importWallet")],
-        [Markup.button.callback("🎯 Snipe", "snipe"),
-        Markup.button.callback("⚙️ Settings", "settings"),Markup.button.callback("💰 Manual Buy", "manualBuy")],
+        [
+          Markup.button.callback("🪪 Create Wallet", "createWallet"),
+          Markup.button.callback("🔑 Import Existing Wallet", "importWallet"),
+        ],
+        [
+          Markup.button.callback("🎯 Snipe", "snipe"),
+          Markup.button.callback("⚙️ Settings", "settings"),
+          Markup.button.callback("💰 Manual Buy", "manualBuy"),
+        ],
       ]),
     });
   } else {
@@ -89,14 +104,14 @@ bot.action("manualBuy", async (ctx) => {
 });
 
 bot.action("cancelImport", (ctx) => {
-  ctx.deleteMessage()
+  ctx.deleteMessage();
   return ctx.scene.leave();
 });
 
-try{
-  bot.launch();
-}
-catch{
-  console.log("Error Launching Bot!")
-}
-
+module.exports = function start() {
+  try {
+    bot.launch();
+  } catch {
+    console.log("Error Launching Bot!");
+  }
+};
