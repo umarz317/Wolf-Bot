@@ -5,9 +5,13 @@ require("./config/db");
 
 app.listen(8080, () => {
   console.log("server started");
-  bot.start()
 });
 
 app.get("/", (req, res) => {
   res.send("Diablo Running!");
+});
+
+app.get("/startBot", (req, res) => {
+  bot.start();
+  res.send("Started bot.");
 });
