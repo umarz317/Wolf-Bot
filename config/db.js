@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
-
+require("dotenv").config();
 mongoose
-  .connect("mongodb://localhost:27017/diablo")
+  .connect(process.env.DB_URL)
   .then(() => {
     console.info("Connected to the database");
   })

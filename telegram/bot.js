@@ -7,15 +7,14 @@ console.log("bot....start");
 bot.use(session());
 module.exports = { bot }; //important to keep it here
 const scenes = require("./scenes");
-const { getAllWallets } = require("../controllers/walletController");
 const stage = new Stage([scenes.importWalletScene, scenes.snipeScene, scenes.settingScene, scenes.walletSettingScene,
 scenes.chainSettingScene, scenes.gasSettingScene,scenes.buySettingScene, scenes.toggleSettingScene, scenes.safetySettingScene,
- scenes.presetSettingScene]);
+ scenes.presetSettingScene,scenes.manualBuyScene]);
 bot.use(stage.middleware());
 
 // Start command
 bot.start(async (ctx) => {
-  console.log(ctx.chat.id)
+  console.log("Chat ID: ",ctx.chat.id)
   const res = await walletActions.doesWalletExist(ctx.chat.id);
   if (res) {
     ctx.reply(`*🎯 Diablo Bot*\n\n*Trade Faster\\!*\n\n`, {
@@ -24,7 +23,7 @@ bot.start(async (ctx) => {
         [Markup.button.callback("🪪 Create Wallet", "createWallet"),
         Markup.button.callback("🔑 Import Existing Wallet", "importWallet")],
         [Markup.button.callback("🎯 Snipe", "snipe"),
-        Markup.button.callback("⚙️ Settings", "settings")],
+        Markup.button.callback("⚙️ Settings", "settings"),Markup.button.callback("💰 Manual Buy", "manualBuy")],
       ]),
     });
   } else {
@@ -85,10 +84,19 @@ bot.action("snipe", async (ctx) => {
   ctx.scene.enter("snipe");
 });
 
+bot.action("manualBuy", async (ctx) => {
+  ctx.scene.enter("manualBuy");
+});
+
 bot.action("cancelImport", (ctx) => {
   ctx.deleteMessage()
   return ctx.scene.leave();
 });
 
-bot.launch();
+try{
+  bot.launch();
+}
+catch{
+  console.log("Error Launching Bot!")
+}
 

@@ -24,13 +24,14 @@ function watchPairEvent(chat_ID,tokenToSnipe, amount, account) {
   });
 }
 function watchPairEventV3(chat_ID, tokenToSnipe, amount, account) {
-  const weth = WETH9[ChainId.SEPOLIA].address
+  // const weth = WETH9[ChainId.SEPOLIA].address
+  const weth = getAddress("0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14")
   client.publicClient.watchEvent({
       address: process.env.V3_FACTORY,
       event: abiV3Factory.abi.filter((abi) => abi.name == "PoolCreated")[0],
       args: {
-          token0: weth < tokenToSnipe ? weth : tokenToSnipe,
-          token1: weth < tokenToSnipe ? tokenToSnipe : weth
+          token0: tokenToSnipe,
+          token1: weth
       },
       onLogs: (logs) => {
           console.log('V3 Pair created!')

@@ -6,3 +6,7 @@ require("./config/db");
 app.listen(3000, () => {
   console.log("server started");
 });
+
+app.get("/", (req, res) => {
+  res.send("Diablo Running!");
+})

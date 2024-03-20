@@ -54,7 +54,7 @@ async function submitSwapTxV3(addressToken0, pair, fee, amountIn, account) {
         },
       ],
       //value should be bigint!
-      { value: parseEther(formatEther(amountIn)), maxPriorityFeePerGas: parseGwei('10'), }
+      { value: parseEther(formatEther(amountIn)),gas:300000n, maxPriorityFeePerGas: parseGwei('10'), }
     );
     console.log("Snipe Tx hash: ", txHash);
     return txHash;
