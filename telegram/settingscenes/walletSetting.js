@@ -73,7 +73,7 @@ walletSettingScene.enter((ctx) => {
     ctx.reply('Wallet deleted successfully.');
   });
 
-  const walletOptions = {'defaultWallet':{name:"Default Wallet"}, 'defaultAutoSniperWallet':{name:"Default Auto Sniper Wallet"},
+  const walletOptions = {'defaultAutoSniperWallet':{name:"Default Auto Sniper Wallet"},
    'defaultManualBuyerWallets':{name:"Default Manual Buyer Wallets"}};
 
   Object.keys(walletOptions).forEach(setting => {
@@ -81,7 +81,9 @@ walletSettingScene.enter((ctx) => {
     ctx.deleteMessage()
     const userId = ctx.from.id;
     const fromDb = await getSettingValue(userId,setting)
-    ctx.session.walletsetting =fromDb
+    //defaults to zero if not set
+    fromDb = fromDb?fromDb:0
+    ctx.session.walletsetting = fromDb
     const userWallets = await Wallet.findOne({ id: userId });
     if (userWallets && userWallets.wallets.length > 0) {
       const walletButtons = userWallets.wallets.map((wallet, index) =>

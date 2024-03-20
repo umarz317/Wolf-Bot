@@ -2,6 +2,7 @@ const { isAddress } = require("viem");
 const contractHelper = require("./contractHelper");
 const { bot } = require("../telegram/bot");
 const { privateKeyToAddress } = require("viem/accounts");
+const { publicClient } = require("./client");
 
 function isValidPrivateKey(pk) {
   if (!pk.startsWith("0x")) {
@@ -36,6 +37,12 @@ async function isERC20(token) {
   }
 }
 
+async function getPair(address0,client){
+  var contract =  contractHelper.getSushiFactoryV2(client);
+  var pair = await contract.read.getPair([address0,process.env.WETH]);
+  return pair
+}
+
 function sendMessage(chatID, message) {
   bot.telegram.sendMessage(chatID, message);
 }
@@ -45,4 +52,4 @@ async function fetchTokenDecimals(address) {
   return decimals;
 }
 
-module.exports = { isValidPrivateKey, isValidAddress, isERC20, sendMessage,fetchTokenDecimals };
+module.exports = { isValidPrivateKey, isValidAddress, isERC20, sendMessage,fetchTokenDecimals,getPair };

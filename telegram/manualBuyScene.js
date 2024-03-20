@@ -4,6 +4,8 @@ const walletActions = require("../utils/walletActions");
 const snipe = require("./sniper");
 const Wallet = require("../models/wallet");
 const { Markup } = require("telegraf");
+const settingsHelpers = require('../telegram/helpers')
+const client = require("../utils/client");
 
 const manualBuyScene = new WizardScene(
   "manualBuy",
@@ -58,14 +60,23 @@ const manualBuyScene = new WizardScene(
 
 manualBuyScene.action(/^preset/,async (ctx)=>{
   const value = ctx.callbackQuery.data.split(':')[1]
+  ctx.reply("🔃Fetching Pair.....")
+  const pair = await helpers.getPair(ctx.session.messages[0],client.publicClient)
+  if(pair===undefined){
+    ctx.reply("❌ Pair not found, please enter a valid token address.")
+    return
+  }
+  ctx.reply("✅ Pair found.")
   const wallet = await walletActions.getAllWallets(ctx.chat.id);
-  //test
+  var defaultWalletIndex = settingsHelpers.getSettingValue(ctx.chat.id, "defaultManualBuyerWallets");
+  defaultWalletIndex = defaultWalletIndex ? defaultWalletIndex : 0;
+  //move from snipe to buy
   snipe.sushiV2(
     ctx.chat.id,
     ctx.session.messages[0],
-    "0x55ff76bffc3cdd9d5fdbbc2ece4528ecce45047e",
+    pair,
     value,
-    wallet[0]
+    wallet[defaultWalletIndex]
   );
   ctx.reply("✅ Buy setup complete, We'll buy the token and update you.");
   ctx.scene.leave();

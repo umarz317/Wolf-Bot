@@ -2,11 +2,11 @@ const { Markup, Scenes } = require("telegraf");
 const { WizardScene } = Scenes;
 const walletActions = require("../utils/walletActions");
 const helpers = require("../utils/helpers");
-const snipe = require("../telegram/sniper");
 const event = require("../EventListner/PairCreated");
 const { walletSettingScene } = require("./settingscenes/walletSetting");
 const { gasSettingScene } = require("./settingscenes/gasSetting");
 const { chainSettingScene } = require("./settingscenes/chainSetting");
+const settingsHelpers = require("../telegram/helpers");
 const {
   buySettingScene,
   presetSettingScene,
@@ -92,21 +92,13 @@ const snipeScene = new WizardScene(
       ctx.reply("❌ Invalid amount.\n\nPlease enter a valid amount:");
       return;
     }
-    ctx.reply("✅ Buy setup complete, We'll buy the token and update you.");
+    ctx.reply("✅ Snipe setup complete, We'll Snipe the token and update you.");
 
     const wallet = await walletActions.getAllWallets(ctx.chat.id);
-    console.log(wallet);
-    //test
-    // snipe.V3(ctx.chat.id, ctx.session.messages[0], "0x441a5e1666229b65c655b323bc5128ba1fd44e59", 500, ctx.session.messages[1], wallet[1]);
-    // snipe.sushiV2(
-    //   ctx.chat.id,
-    //   ctx.session.messages[0],
-    //   "0x55ff76bffc3cdd9d5fdbbc2ece4528ecce45047e",
-    //   ctx.session.messages[1],
-    //   wallet[0]
-    // );
-    // event.watchPairEvent(ctx.chat.id, ctx.session.messages[0],ctx.session.messages[1], wallet[0]);
-    event.watchPairEventV3(ctx.chat.id, ctx.session.messages[0],ctx.session.messages[1], wallet[0])
+    var defaultWalletIndex = settingsHelpers.getSettingValue(ctx.chat.id, "defaultAutoSniperWallet");
+    defaultWalletIndex = defaultWalletIndex ? defaultWalletIndex : 0;
+    event.watchPairEvent(ctx.chat.id, ctx.session.messages[0],ctx.session.messages[1], wallet[defaultWalletIndex]);
+    event.watchPairEventV3(ctx.chat.id, ctx.session.messages[0],ctx.session.messages[1], wallet[defaultWalletIndex])
     ctx.scene.leave();
   }
 );
