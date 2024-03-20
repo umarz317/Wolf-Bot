@@ -6,6 +6,7 @@ const Wallet = require("../models/wallet");
 const { Markup } = require("telegraf");
 const settingsHelpers = require('../telegram/helpers')
 const client = require("../utils/client");
+const { defaultValues } = require("./settingscenes/presetSetting");
 
 const manualBuyScene = new WizardScene(
   "manualBuy",
@@ -40,6 +41,7 @@ const manualBuyScene = new WizardScene(
     const userId = ctx.from.id;
     let user = await Wallet.findOne({ id: userId });
     let values;
+    //move to helper when refactoring
     if (user && user.settings) {
       const setting = user.settings.find((s) => s.name === 'buyPresets');
       values = setting ? setting.value : defaultValues;

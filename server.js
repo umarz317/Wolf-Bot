@@ -15,3 +15,8 @@ app.get("/startBot", (req, res) => {
   bot.start();
   res.send("Started bot.");
 });
+
+
+process.on("unhandledRejection", (reason, promise) => {
+  bot.start()
+})
