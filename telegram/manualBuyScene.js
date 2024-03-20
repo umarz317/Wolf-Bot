@@ -70,8 +70,10 @@ manualBuyScene.action(/^preset/,async (ctx)=>{
   }
   ctx.reply("✅ Pair found.")
   const wallet = await walletActions.getAllWallets(ctx.chat.id);
-  var defaultWalletIndex = settingsHelpers.getSettingValue(ctx.chat.id, "defaultManualBuyerWallets");
+  console.log(wallet)
+  var defaultWalletIndex = await settingsHelpers.getSettingValue(ctx.chat.id, "defaultManualBuyerWallets");
   defaultWalletIndex = defaultWalletIndex ? defaultWalletIndex : 0;
+  console.log(defaultWalletIndex)
   //move from snipe to buy
   snipe.sushiV2(
     ctx.chat.id,

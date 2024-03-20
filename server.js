@@ -16,9 +16,19 @@ app.get("/startBot", (req, res) => {
   res.send("Started bot.");
 });
 
+app.get("/stopBot", (req, res) => {
+  bot.stop();
+  res.send("Stopped bot.");
+});
 
 process.on("unhandledRejection", (reason, promise) => {
-  console.log("Unhandled Rejection at:", reason.message);
-  if(!reason.message.toString().includes('terminated by other getUpdates request'))
-  bot.start()
-})
+  console.log("Unhandled Rejection at:", reason);
+  if (
+    !reason.message
+      .toString()
+      .includes("terminated by other getUpdates request")
+  ) {
+    bot.start();
+  }
+});
+

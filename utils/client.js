@@ -1,20 +1,24 @@
 const { createPublicClient, http, createWalletClient } = require("viem");
 const { privateKeyToAccount } = require("viem/accounts");
-const { polygon, sepolia } = require("viem/chains");
+const { polygon, sepolia, base } = require("viem/chains");
 require("dotenv").config();
-const keyManagement = require('./keyManagement')
+const keyManagement = require("./keyManagement");
 
 const publicClient = createPublicClient({
-  chain: process.env.POLYGON==='true'?polygon:sepolia,
-  transport: process.env.POLYGON==='true'?http():http(process.env.RPC),
+  // chain: process.env.POLYGON==='true'?polygon:sepolia,
+  chain: base,
+  // transport: process.env.POLYGON==='true'?http():http(process.env.RPC),
+  transport: http(),
 });
 async function getWalletClientFromAccount(account) {
   const walletClient = createWalletClient({
-    chain: process.env.POLYGON==='true'?polygon:sepolia,
-    transport: process.env.POLYGON==='true'?http():http(process.env.RPC),
+    // chain: process.env.POLYGON==='true'?polygon:sepolia,
+    chain: base,
+    // transport: process.env.POLYGON==='true'?http():http(process.env.RPC),
+    transport: http(),
     account: privateKeyToAccount(keyManagement.decrypt(account.privateKey)),
   });
-  return walletClient
+  return walletClient;
 }
 // //test
 // function getWalletClientFromPK() {
@@ -37,4 +41,4 @@ async function getWalletClientFromAccount(account) {
 //   });
 //   return walletClient
 // }
-module.exports = { publicClient, getWalletClientFromAccount};
+module.exports = { publicClient, getWalletClientFromAccount };

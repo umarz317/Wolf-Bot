@@ -117,4 +117,9 @@ function start() {
   }
 }
 
-module.exports = { start };
+function stop(){
+  bot.stop();
+  console.log("Bot Stopped...");
+}
+
+module.exports = { start,stop };

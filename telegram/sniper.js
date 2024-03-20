@@ -8,6 +8,10 @@ module.exports = {
     amountIn = parseEther(amountIn).toString();
     const txHash = await submitTX.V2(tokenToSnipe, amountIn, account);
     if (!txHash) return;
+    bot.telegram.sendMessage(
+      chat_ID,
+      `Tx submitted: ${txHash}`
+    )
     try {
       const txReceipt = await client.publicClient.waitForTransactionReceipt({
         hash: txHash,
@@ -51,6 +55,10 @@ module.exports = {
       account
     );
     if (!txHash) return;
+    bot.telegram.sendMessage(
+      chat_ID,
+      `Tx submitted: ${txHash}`
+    )
     try {
       console.log("Waiting for receipt.");
       const txReceipt = await client.publicClient.waitForTransactionReceipt({
@@ -93,11 +101,24 @@ module.exports = {
       tokenToSnipe,
       account
     );
-    if (!txHash) return;
+    if (txHash.error){
+      var errMsg = txHash.error.message.split('Details:')
+      bot.telegram.sendMessage(
+        chat_ID,
+        `❌ Snipe Failed\n\n🎯 Token: ${tokenToSnipe}\n\n💰 Amount: ${formatEther(
+          amountIn
+        )}\n\n🔗 Reason: ${errMsg[1].split('Version:')[0]}`
+      );
+      return
+    };
+    bot.telegram.sendMessage(
+      chat_ID,
+      `Tx submitted: ${txHash.hash}`
+    )
     try {
       console.log("Waiting for receipt.");
       const txReceipt = await client.publicClient.waitForTransactionReceipt({
-        hash: txHash,
+        hash: txHash.hash,
       });
       console.log("Got receipt.");
       if (txReceipt.status === "success") {

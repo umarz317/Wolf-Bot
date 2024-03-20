@@ -10,34 +10,48 @@ const {
   createPublicClient,
 } = require("viem");
 const contractHelper = require("../../utils/contractHelper");
-const {  publicClient , getWalletClientFromAccount } = require("../../utils/client");
+const {
+  publicClient,
+  getWalletClientFromAccount,
+} = require("../../utils/client");
 const routeProcessorABI = require("../../abi/routeProcessor.json");
 
 async function submitSushiTx(amountIn, pair, tokenToSnipe, account) {
-  console.log(account)
+  try {
     var to = account.address;
-  var route = encodeRoute(pair, process.env.SUSHI_WRAP_TOKEN, to);
-  console.log("Simulating route...");
-  var amountOut = await publicClient.simulateContract({
-    address: process.env.SUSHI_ROUTE_PROCESSOR,
-    abi: routeProcessorABI,
-    functionName: "processRoute",
-    args: [process.env.NATIVE_TOKEN, amountIn, tokenToSnipe, 0, to, route],
-    value: amountIn,
-  });
-  amountOut = amountOut.result;
-  console.log("Amount out: " + amountOut);
-  amountOut = parseInt(amountOut);
-  var amountOutMin = parseInt(amountOut - amountOut * 0.5);
-  var walletClient = await getWalletClientFromAccount(account);
-  var sushiRouteProcessor = contractHelper.getSushiRouteProcessor(walletClient);
-  console.log("Sending transaction...");
-  var hash = await sushiRouteProcessor.write.processRoute(
-    [process.env.NATIVE_TOKEN, amountIn, tokenToSnipe, amountOutMin, to, route],
-    { value: amountIn, gas: 300000n }
-  );
-  console.log("Transaction hash: " + hash);
-  return hash
+    var route = encodeRoute(pair, process.env.SUSHI_WRAP_TOKEN, to);
+    console.log("Simulating route...");
+    var amountOut = await publicClient.simulateContract({
+      address: process.env.SUSHI_ROUTE_PROCESSOR,
+      abi: routeProcessorABI,
+      functionName: "processRoute",
+      args: [process.env.NATIVE_TOKEN, amountIn, tokenToSnipe, 0, to, route],
+      value: amountIn,
+    });
+    amountOut = amountOut.result;
+    amountOut = parseInt(amountOut);
+    var amountOutMin = parseInt(amountOut - amountOut * 0.5);
+    var walletClient = await getWalletClientFromAccount(account);
+    var sushiRouteProcessor =
+      contractHelper.getSushiRouteProcessor(walletClient);
+    console.log("Sending transaction...");
+    var hash = await sushiRouteProcessor.write.processRoute(
+      [
+        process.env.NATIVE_TOKEN,
+        amountIn,
+        tokenToSnipe,
+        amountOutMin,
+        to,
+        route,
+      ],
+      { value: amountIn, gas: 300000n }
+    );
+    console.log("Transaction hash: " + hash);
+    return {hash: hash, error: null};
+  } catch (e) {
+    console.log(e);
+    return {hash: null, error: e};
+  }
 }
 
 function encodeRoute(pair, warpMatic, to) {
