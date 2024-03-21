@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
-const {settingSchema} = require("./setting")
-const walletEntrySchema = new Schema(
+
+const walletSchema = new Schema(
   {
     address: {
       type: String,
@@ -15,15 +15,4 @@ const walletEntrySchema = new Schema(
   { _id: false }
 );
 
-const walletSchema = new Schema({
-  id: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  wallets: [walletEntrySchema],
-  settings: [settingSchema],
-});
-
-const Wallet = mongoose.model("Wallet", walletSchema);
-module.exports = Wallet;
+module.exports = {walletSchema}

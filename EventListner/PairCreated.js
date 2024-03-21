@@ -3,7 +3,7 @@ const abiV3Factory = require("@uniswap/v3-core/artifacts/contracts/UniswapV3Fact
 const {ChainId,WETH9} = require("@uniswap/sdk-core");
 const client = require("../utils/client");
 const { trim, getAddress } = require("viem");
-const snipe = require("../telegram/sniper"); 
+const snipe = require("../telegram/handler"); 
 require("dotenv").config();
 
 function watchPairEvent(chat_ID,tokenToSnipe, amount, account) {
@@ -15,7 +15,7 @@ function watchPairEvent(chat_ID,tokenToSnipe, amount, account) {
       const tokens = getTokensFromEventTopic(logs[0].topics);
       if (isPairSnipeable(tokenToSnipe, tokens)) {
         console.log('Pair snipeable!')
-        snipe.V2(chat_ID,tokenToSnipe, amount, account);
+        snipe.V2(chat_ID,tokenToSnipe, amount, account,"Snipe");
       }
     },
     onError: (err) => {
@@ -25,7 +25,6 @@ function watchPairEvent(chat_ID,tokenToSnipe, amount, account) {
 }
 function watchPairEventV3(chat_ID, tokenToSnipe, amount, account) {
   const weth = WETH9[ChainId.BASE].address
-  // const weth = getAddress("0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14")
   client.publicClient.watchEvent({
       address: process.env.V3_FACTORY,
       event: abiV3Factory.abi.filter((abi) => abi.name == "PoolCreated")[0],
@@ -36,13 +35,14 @@ function watchPairEventV3(chat_ID, tokenToSnipe, amount, account) {
       onLogs: (logs) => {
           console.log('V3 Pair created!')
           console.log('Pair snipeable!')
-          snipe.V3(chat_ID, tokenToSnipe, logs[0].args.pool, logs[0].args.fee, amount, account);
+          snipe.V3(chat_ID, tokenToSnipe, logs[0].args.pool, logs[0].args.fee, amount, account,"Snipe");
       },
       onError: (err) => {
           console.log(err);
       },
   });
   }
+
 function getTokensFromEventTopic(topics) {
   return topics.slice(1).map((topic) => trim(topic));
 }

@@ -1,19 +1,19 @@
 const { Markup, Scenes } = require("telegraf");
 const { WizardScene } = Scenes;
-const walletActions = require("../utils/walletActions");
-const helpers = require("../utils/helpers");
-const event = require("../EventListner/PairCreated");
-const { walletSettingScene } = require("./settingscenes/walletSetting");
-const { gasSettingScene } = require("./settingscenes/gasSetting");
-const { chainSettingScene } = require("./settingscenes/chainSetting");
-const settingsHelpers = require("../telegram/helpers");
+const helpers = require("../../utils/helpers");
+const event = require("../../EventListner/PairCreated");
+const { walletSettingScene } = require("../scenes/settingscenes/walletSetting");
+const { gasSettingScene } = require("../scenes/settingscenes/gasSetting");
+const { chainSettingScene } = require("../scenes/settingscenes/chainSetting");
+const userActions = require("../../utils/userActions");
 const {
   buySettingScene,
   presetSettingScene,
-} = require("./settingscenes/presetSetting");
-const { safetySettingScene } = require("./settingscenes/safetySetting");
-const { toggleSettingScene } = require("./settingscenes/toggleSetting");
+} = require("../scenes/settingscenes/presetSetting");
+const { safetySettingScene } = require("../scenes/settingscenes/safetySetting");
+const { toggleSettingScene } = require("../scenes/settingscenes/toggleSetting");
 const { manualBuyScene } = require("./manualBuyScene");
+
 const importWalletScene = new WizardScene(
   "import-wallet",
   (ctx) => {
@@ -35,7 +35,7 @@ const importWalletScene = new WizardScene(
       );
       return;
     }
-    const res = await walletActions.importWallet(ctx.chat.id, pk);
+    const res = await userActions.importUserWallet(ctx.chat.id, pk);
     if (res.success) {
       ctx.reply("✅ " + res.message);
     } else {
@@ -63,13 +63,13 @@ const snipeScene = new WizardScene(
     if (!helpers.isValidAddress(token)) {
       ctx.reply(
         "❌ Invalid token address.\n\nPlease enter a valid token address:"
-      );
+      ,Markup.inlineKeyboard([Markup.button.callback("❌ Cancel Snipe", "cancelSnipe")]));
       return;
     }
     if (!(await helpers.isERC20(token))) {
       ctx.reply(
         "❌ Invalid token address, the address is not a ERC20 token.\n\nPlease enter a valid token address:"
-      );
+      ,Markup.inlineKeyboard([Markup.button.callback("❌ Cancel Snipe", "cancelSnipe")]));
       return;
     }
     ctx.reply("✅ Token address is valid.");
@@ -89,20 +89,24 @@ const snipeScene = new WizardScene(
     tmp.push(amount);
     ctx.session.messages = tmp;
     if (isNaN(amount)) {
-      ctx.reply("❌ Invalid amount.\n\nPlease enter a valid amount:");
+      ctx.reply("❌ Invalid amount.\n\nPlease enter a valid amount:",Markup.inlineKeyboard([Markup.button.callback("❌ Cancel Snipe", "cancelSnipe")]));
       return;
     }
     ctx.reply("✅ Snipe setup complete, We'll Snipe the token and update you.");
 
-    const wallet = await walletActions.getAllWallets(ctx.chat.id);
-    var defaultWalletIndex = settingsHelpers.getSettingValue(ctx.chat.id, "defaultAutoSniperWallet");
+    const wallet = await userActions.getAllUserWallets(ctx.chat.id);
+    var defaultWalletIndex = userActions.getUserSettingValue(ctx.chat.id, "defaultAutoSniperWallet");
     defaultWalletIndex = defaultWalletIndex ? defaultWalletIndex : 0;
     event.watchPairEvent(ctx.chat.id, ctx.session.messages[0],ctx.session.messages[1], wallet[defaultWalletIndex]);
     event.watchPairEventV3(ctx.chat.id, ctx.session.messages[0],ctx.session.messages[1], wallet[defaultWalletIndex])
     ctx.scene.leave();
   }
 );
-
+snipeScene.action("cancelSnipe", (ctx) => {
+  ctx.deleteMessage();
+  ctx.reply("❌ Snipe cancelled.");
+  ctx.scene.leave();
+});
 const settingScene = new Scenes.WizardScene(
   "settings",
   (ctx) => {

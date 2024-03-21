@@ -38,7 +38,7 @@ async function submitSwapTxV3(addressToken0, pair, fee, amountIn, account) {
     var amountOutMinimum = parseInt(
       amount - (amount * slippageTolerance) / 100
     ).toString();
-    console.log("Sending Snipe TX")
+    console.log("Sending TX")
     const txHash = await router.write.exactInputSingle(
       [
         {
@@ -56,7 +56,7 @@ async function submitSwapTxV3(addressToken0, pair, fee, amountIn, account) {
       //value should be bigint!
       { value: parseEther(formatEther(amountIn)),gas:300000n, maxPriorityFeePerGas: parseGwei('10'), }
     );
-    console.log("Snipe Tx hash: ", txHash);
+    console.log("Tx hash: ", txHash);
     return txHash;
   } catch (e) {
     console.log(e);

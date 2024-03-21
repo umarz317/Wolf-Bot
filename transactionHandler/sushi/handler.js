@@ -1,13 +1,7 @@
 const {
-  createClient,
-  http,
   encodePacked,
-  publicActions,
   toHex,
   isAddress,
-  toBytes,
-  hexToBytes,
-  createPublicClient,
 } = require("viem");
 const contractHelper = require("../../utils/contractHelper");
 const {

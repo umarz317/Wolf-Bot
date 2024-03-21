@@ -1,7 +1,6 @@
 const {
   Token,
   ChainId,
-  WETH9,
   CurrencyAmount,
   TradeType,
   Percent,

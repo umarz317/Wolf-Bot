@@ -37,10 +37,18 @@ async function isERC20(token) {
   }
 }
 
-async function getPair(address0,client){
-  var contract =  contractHelper.getSushiFactoryV2(client);
-  var pair = await contract.read.getPair([address0,process.env.WETH]);
-  return pair
+async function getPair(address0, client, type) {
+  console.log(type)
+// TODO: Add enums for type/make a constants file for all the strings
+  if (type === "sushi V2") {
+    var contract = contractHelper.getSushiFactoryV2(client);
+    var pair = await contract.read.getPair([address0, process.env.WETH]);
+    return pair;
+  } else if (type === "uni V2") {
+    var contract = contractHelper.getUniFactoryV2(client);
+    var pair = await contract.read.getPair([address0, process.env.WETH]);
+    return pair;
+  }
 }
 
 function sendMessage(chatID, message) {
@@ -52,4 +60,11 @@ async function fetchTokenDecimals(address) {
   return decimals;
 }
 
-module.exports = { isValidPrivateKey, isValidAddress, isERC20, sendMessage,fetchTokenDecimals,getPair };
+module.exports = {
+  isValidPrivateKey,
+  isValidAddress,
+  isERC20,
+  sendMessage,
+  fetchTokenDecimals,
+  getPair,
+};

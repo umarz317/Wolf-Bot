@@ -32,3 +32,5 @@ process.on("unhandledRejection", (reason, promise) => {
   }
 });
 
+bot.start()
+

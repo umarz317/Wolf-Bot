@@ -1,12 +1,13 @@
 require("dotenv").config();
 const { Telegraf, Markup, Scenes, session } = require("telegraf");
 const { Stage } = Scenes;
-const walletActions = require("../utils/walletActions");
+const userActions = require("../utils/userActions");
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
 bot.use(session());
 module.exports = { bot }; //important to keep it here
-const scenes = require("./scenes");
+const scenes = require("./scenes/sceneMain");
+
 const stage = new Stage([
   scenes.importWalletScene,
   scenes.snipeScene,
@@ -25,7 +26,7 @@ bot.use(stage.middleware());
 // Start command
 bot.start(async (ctx) => {
   console.log("Chat ID: ", ctx.chat.id);
-  const res = await walletActions.doesWalletExist(ctx.chat.id);
+  const res = await userActions.doesUserWalletExist(ctx.chat.id);
   if (res) {
     ctx.reply(`*🎯 Diablo Bot*\n\n*Trade Faster\\!*\n\n`, {
       parse_mode: "MarkdownV2",
@@ -51,11 +52,10 @@ bot.start(async (ctx) => {
   }
 });
 
-// Handle 'createWallet' action
 bot.action("createWallet", async (ctx) => {
-  var res = await walletActions.doesWalletExist(ctx.chat.id);
+  var res = await userActions.doesUserWalletExist(ctx.chat.id);
   if (res) {
-    const { address, pk, success } = await walletActions.generateAndSaveWallet(
+    const { address, pk, success } = await userActions.generateAndSaveUserWallet(
       ctx.chat.id
     );
     if (success) {
@@ -80,7 +80,7 @@ bot.action("createWallet", async (ctx) => {
 
 // Handle 'importWallet' action
 bot.action("importWallet", async (ctx) => {
-  var res = await walletActions.doesWalletExist(ctx.chat.id);
+  var res = await userActions.doesUserWalletExist(ctx.chat.id);
   if (res) {
     ctx.scene.enter("import-wallet");
   } else {

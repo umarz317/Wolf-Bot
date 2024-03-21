@@ -1,10 +1,10 @@
 const submitTX = require("../transactionHandler/submitTX");
 const { parseEther, formatEther } = require("viem");
 const client = require("../utils/client");
-const { bot } = require("../telegram/bot");
+const { bot } = require("./bot");
 
 module.exports = {
-  V2: async function snipeToken(chat_ID, tokenToSnipe, amountIn, account) {
+  V2: async (chat_ID, tokenToSnipe, amountIn, account, type) => {
     amountIn = parseEther(amountIn).toString();
     const txHash = await submitTX.V2(tokenToSnipe, amountIn, account);
     if (!txHash) return;
@@ -20,7 +20,7 @@ module.exports = {
         console.log("Transaction successful.");
         bot.telegram.sendMessage(
           chat_ID,
-          `✅ Snipe Successful\n\n🎯 Token: ${tokenToSnipe}\n\n💰 Amount: ${formatEther(
+          `✅ ${type} Successful\n\n🎯 Token: ${tokenToSnipe}\n\n💰 Amount: ${formatEther(
             amountIn
           )}`
         );
@@ -28,7 +28,7 @@ module.exports = {
         console.log("Transaction failed.");
         bot.telegram.sendMessage(
           chat_ID,
-          `❌ Snipe Failed\n\n🎯 Token: ${tokenToSnipe}\n\n💰 Amount: ${formatEther(
+          `❌ ${type} Failed\n\n🎯 Token: ${tokenToSnipe}\n\n💰 Amount: ${formatEther(
             amountIn
           )}`
         );
@@ -38,14 +38,15 @@ module.exports = {
       console.log("Failed to get receipt.");
     }
   },
-  V3: async function snipeToken(
+  V3: async(
     chat_ID,
     tokenToSnipe,
     pair,
     fee,
     amountIn,
-    account
-  ) {
+    account,
+    type
+  ) => {
     amountIn = parseEther(amountIn).toString();
     const txHash = await submitTX.V3(
       tokenToSnipe,
@@ -69,7 +70,7 @@ module.exports = {
         console.log("Transaction successful.");
         bot.telegram.sendMessage(
           chat_ID,
-          `✅ Snipe Successful\n\n🎯 Token: ${tokenToSnipe}\n\n💰 Amount: ${formatEther(
+          `✅ ${type} Successful\n\n🎯 Token: ${tokenToSnipe}\n\n💰 Amount: ${formatEther(
             amountIn
           )}`
         );
@@ -77,7 +78,7 @@ module.exports = {
         console.log("Transaction failed.");
         bot.telegram.sendMessage(
           chat_ID,
-          `❌ Snipe Failed\n\n🎯 Token: ${tokenToSnipe}\n\n💰 Amount: ${formatEther(
+          `❌ ${type} Failed\n\n🎯 Token: ${tokenToSnipe}\n\n💰 Amount: ${formatEther(
             amountIn
           )}`
         );
@@ -87,13 +88,13 @@ module.exports = {
       console.log("Failed to get receipt.");
     }
   },
-  sushiV2: async function snipeToken(
+  sushiV2: async(
     chat_ID,
     tokenToSnipe,
     pair,
     amountIn,
     account
-  ) {
+  ) => {
     amountIn = parseEther(amountIn)
     const txHash = await submitTX.sushiV2(
       amountIn,
@@ -105,7 +106,7 @@ module.exports = {
       var errMsg = txHash.error.message.split('Details:')
       bot.telegram.sendMessage(
         chat_ID,
-        `❌ Snipe Failed\n\n🎯 Token: ${tokenToSnipe}\n\n💰 Amount: ${formatEther(
+        `❌ ${type} Failed\n\n🎯 Token: ${tokenToSnipe}\n\n💰 Amount: ${formatEther(
           amountIn
         )}\n\n🔗 Reason: ${errMsg[1].split('Version:')[0]}`
       );
@@ -125,7 +126,7 @@ module.exports = {
         console.log("Transaction successful.");
         bot.telegram.sendMessage(
           chat_ID,
-          `✅ Snipe Successful\n\n🎯 Token: ${tokenToSnipe}\n\n💰 Amount: ${formatEther(
+          `✅ ${type} Successful\n\n🎯 Token: ${tokenToSnipe}\n\n💰 Amount: ${formatEther(
             amountIn
           )}`
         );
@@ -133,7 +134,7 @@ module.exports = {
         console.log("Transaction failed.");
         bot.telegram.sendMessage(
           chat_ID,
-          `❌ Snipe Failed\n\n🎯 Token: ${tokenToSnipe}\n\n💰 Amount: ${formatEther(
+          `❌ ${type} Failed\n\n🎯 Token: ${tokenToSnipe}\n\n💰 Amount: ${formatEther(
             amountIn
           )}`
         );
