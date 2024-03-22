@@ -5,16 +5,17 @@ toggleSettingScene.enter((ctx) => {
   ctx.reply(
     "Toggle Setting Options:",
     Markup.inlineKeyboard([
-      [Markup.button.callback("🛡 Anti Rug", "antiRug")],
-      [Markup.button.callback("🔄 First Bundle Backup", "firstBundleBackup")],
-      [
-        Markup.button.callback(
-          "⛔ Transfer on Blacklist",
-          "transferOnBlacklist"
-        ),
-      ],
-      [Markup.button.callback("🔁 MaxTx or Revert", "maxTxOrRevert")],
-      [Markup.button.callback("🤪 Degen Mode", "degenMode")],
+      [Markup.button.callback("⚠️ Under Development", "hmm")],
+      // [Markup.button.callback("🛡 Anti Rug", "antiRug")],
+      // [Markup.button.callback("🔄 First Bundle Backup", "firstBundleBackup")],
+      // [
+      //   Markup.button.callback(
+      //     "⛔ Transfer on Blacklist",
+      //     "transferOnBlacklist"
+      //   ),
+      // ],
+      // [Markup.button.callback("🔁 MaxTx or Revert", "maxTxOrRevert")],
+      // [Markup.button.callback("🤪 Degen Mode", "degenMode")],
       [Markup.button.callback("🔙 Back", "back")],
       [Markup.button.callback("❌ Close", "close")],
     ])

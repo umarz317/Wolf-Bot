@@ -6,11 +6,13 @@ safetySettingScene.enter((ctx) => {
   ctx.reply(
     "Safety Setting Options:",
     Markup.inlineKeyboard([
-      [Markup.button.callback("🛡 Buy Tax Limit", "buyTaxLimit")],
-      [Markup.button.callback("💸 Sell Tax Limit", "sellTaxLimit")],
-      [Markup.button.callback("🔀 Slippage", "slippage")],
-      [Markup.button.callback("💧 Min Liquidity Limit", "minLiquidityLimit")],
-      [Markup.button.callback("🌊 Max Liquidity Limit", "maxLiquidityLimit")],
+      // [Markup.button.callback("🛡 Buy Tax Limit", "buyTaxLimit")],
+      // [Markup.button.callback("💸 Sell Tax Limit", "sellTaxLimit")],
+      // [Markup.button.callback("🔀 Slippage", "slippage")],
+      // [Markup.button.callback("💧 Min Liquidity Limit", "minLiquidityLimit")],
+      // [Markup.button.callback("🌊 Max Liquidity Limit", "maxLiquidityLimit")],
+      [Markup.button.callback("⚠️ Under Development", "hmm")],
+     
       [
         Markup.button.callback("🔙 Back", "back"),
         Markup.button.callback("❌ Close", "close"),

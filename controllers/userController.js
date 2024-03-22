@@ -96,9 +96,9 @@ module.exports = {
   updateUserSetting: async (userId, settingName, settingValue) => {
     try {
       let previousValue;
-      let user = await Wallet.findOne({ id: userId });
+      let user = await User.findOne({ id: userId });
       if (!user) {
-        user = new Wallet({
+        user = new User({
           userId: userId,
           settings: [{ name: settingName, value: settingValue }],
         });
@@ -122,7 +122,7 @@ module.exports = {
   },
   getUserSettingValue: async (userId, settingName) => {
     try {
-      const user = await Wallet.findOne({ id: userId });
+      const user = await User.findOne({ id: userId });
       if (!user) {
         return null;
       }

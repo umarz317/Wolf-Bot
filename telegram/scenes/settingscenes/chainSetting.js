@@ -7,19 +7,20 @@ chainSettingScene.enter(async (ctx) => {
   ctx.session.selectedChains = chain || {};
   ctx.reply(
     "Select blockchains :",
+// TODO: Setup config and add chain in config
     Markup.inlineKeyboard([
       [
         Markup.button.callback(
-          `Ethereum ${ctx.session.selectedChains === "ethereum" ? "✅" : ""}`,
-          "toggle:ethereum"
+          `Base ${ctx.session.selectedChains === "Base" ? "✅" : ""}`,
+          "toggle:base"
         ),
       ],
-      [
-        Markup.button.callback(
-          `BSC ${ctx.session.selectedChains === "bsc" ? "✅" : ""}`,
-          "toggle:bsc"
-        ),
-      ],
+      // [
+      //   Markup.button.callback(
+      //     `BSC ${ctx.session.selectedChains === "bsc" ? "✅" : ""}`,
+      //     "toggle:bsc"
+      //   ),
+      // ],
       [
         Markup.button.callback("🔙 Back", "back"),
         Markup.button.callback("❌ Close", "close"),
@@ -36,16 +37,16 @@ chainSettingScene.action(/^toggle:(.+)$/, (ctx) => {
     Markup.inlineKeyboard([
       [
         Markup.button.callback(
-          `Ethereum ${ctx.session.selectedChains === "ethereum" ? "✅" : ""}`,
-          "toggle:ethereum"
+          `Base ${ctx.session.selectedChains === "base" ? "✅" : ""}`,
+          "toggle:base"
         ),
       ],
-      [
-        Markup.button.callback(
-          `BSC ${ctx.session.selectedChains === "bsc" ? "✅" : ""}`,
-          "toggle:bsc"
-        ),
-      ],
+      // [
+      //   Markup.button.callback(
+      //     `BSC ${ctx.session.selectedChains === "bsc" ? "✅" : ""}`,
+      //     "toggle:bsc"
+      //   ),
+      // ],
       [Markup.button.callback("Done", "done")],
       [
         Markup.button.callback("🔙 Back", "back"),

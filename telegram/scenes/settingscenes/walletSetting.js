@@ -6,7 +6,7 @@ walletSettingScene.enter((ctx) => {
     "Wallet Setting Options:",
     Markup.inlineKeyboard([
       [Markup.button.callback("🔧 Wallet Setup", "walletSetup")],
-      [Markup.button.callback("🔐 Default Wallet", "defaultWallet")],
+      // [Markup.button.callback("🔐 Default Wallet", "defaultWallet")],
       [
         Markup.button.callback(
           "🎯 Default Auto Sniper Wallet",
@@ -34,7 +34,7 @@ walletSettingScene.action("walletSetup", (ctx) => {
       [Markup.button.callback("🪪 Create Wallet", "createWallet")],
       [Markup.button.callback("🔑 Import Existing Wallet", "importWallet")],
       [
-        Markup.button.callback("🔙 Back", "backToWaletSetting"),
+        Markup.button.callback("🔙 Back", "backToWalletSetting"),
         Markup.button.callback("❌ Close", "close"),
       ],
     ]),
@@ -117,7 +117,7 @@ Object.keys(walletOptions).forEach((setting) => {
   walletSettingScene.action(setting, async (ctx) => {
     ctx.deleteMessage();
     const userId = ctx.from.id;
-    const fromDb = await userActions.getUserSettingValue(userId, setting);
+    var fromDb = await userActions.getUserSettingValue(userId, setting);
     //defaults to zero if not set
     fromDb = fromDb ? fromDb : 0;
     ctx.session.walletsetting = fromDb;
@@ -136,7 +136,7 @@ Object.keys(walletOptions).forEach((setting) => {
         Markup.inlineKeyboard([
           ...walletButtons,
           [
-            Markup.button.callback("🔙 Back", "backToWaletSetting"),
+            Markup.button.callback("🔙 Back", "backToWalletSetting"),
             Markup.button.callback("❌ Close", "close"),
           ],
         ])
@@ -170,7 +170,7 @@ Object.keys(walletOptions).forEach((setting) => {
           Markup.inlineKeyboard([
             ...updatedButtons,
             [
-              Markup.button.callback("🔙 Back", "backToWaletSetting"),
+              Markup.button.callback("🔙 Back", "backToWalletSetting"),
               Markup.button.callback("❌ Close", "close"),
             ],
           ])
@@ -182,7 +182,7 @@ Object.keys(walletOptions).forEach((setting) => {
   });
 });
 
-walletSettingScene.action("backToWaletSetting", (ctx) => {
+walletSettingScene.action("backToWalletSetting", (ctx) => {
   ctx.deleteMessage();
   ctx.scene.enter("walletSettingScene");
 });
