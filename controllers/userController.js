@@ -86,7 +86,7 @@ module.exports = {
   },
   getUser: async (id) => {
     const user = await User.find({id:id});
-    return user;
+    return user[0];
   },
   deleteUserWallet: async (id, indexToDelete) => {
     const user = await User.findOne({ id: id });
@@ -122,6 +122,7 @@ module.exports = {
   },
   getUserSettingValue: async (userId, settingName) => {
     try {
+      console.log(userId,settingName)
       const user = await User.findOne({ id: userId });
       if (!user) {
         return null;
@@ -130,8 +131,10 @@ module.exports = {
       if (!setting) {
         return null;
       }
+      console.log(setting.value,settingName);
       return setting.value;
     } catch (error) {
+      console.log(error)
       return null;
     }
   },

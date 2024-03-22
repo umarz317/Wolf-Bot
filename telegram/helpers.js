@@ -58,7 +58,7 @@ async function onSelectingOption(ctx, option, settingsOptions) {
 
 async function getPresetButtons(userId){
   var defaultValues = ["0.1", "0.2", "0.5", "1", "2", "5"];
-  var user = userActions.getUser(userId)
+  var user = await userActions.getUser(userId)
   let values;
   if (user && user.settings) {
     const setting = user.settings.find((s) => s.name === 'buyPresets');
@@ -69,6 +69,7 @@ async function getPresetButtons(userId){
   const buttons = values.map((value) =>
     Markup.button.callback(`Buy ${value} Eth`, `preset:${value}`)
   );
+  console.log(buttons);
   return buttons
 }
 

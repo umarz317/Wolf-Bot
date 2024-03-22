@@ -1,9 +1,9 @@
 const { Markup, Scenes } = require("telegraf");
-const User = require("../../../models/user");
-const { getSettingValue,getPresetButtons } = require("../../helpers");
+const { getPresetButtons } = require("../../helpers");
 const presetSettingScene = new Scenes.BaseScene("initialPresetSettingScene");
-
+const userActions = require("../../../utils/userActions");
 const settingName = "buyPresets";
+
 presetSettingScene.enter((ctx) => {
   ctx.reply(
     "Select an Option:",
@@ -46,29 +46,25 @@ buySettingScene.enter(async (ctx) => {
   );
 });
 
-buySettingScene.action(/^preset:(\d+)$/, async (ctx) => {
+buySettingScene.action(/^preset:(([0-9]*[.])?\d+)$/, async (ctx) => {
   ctx.deleteMessage();
-  const index = parseInt(ctx.match[1]);
-  const userId = ctx.from.id;
-  const value = (await getSettingValue(userId, settingName))
-    ? await getSettingValue(userId, settingName)
-    : defaultValues;
+  const selectedValue = ctx.callbackQuery.data.split(":")[1];
   const sentMessage = await ctx.reply(
-    `Please enter the new value for the button "Buy ${value[index]} Eth":`
+    `Please enter the new value for the button "Buy ${selectedValue} Eth":`
   );
   const id = sentMessage.message_id;
   ctx.session.botMessageId = id;
-  ctx.session.nextAction = settingName + ":" + index;
+  ctx.session.nextAction = settingName + ":" + selectedValue;
 });
 
 buySettingScene.on("message", async (ctx) => {
   if (ctx.session.nextAction && ctx.message.text && ctx.session.nextAction) {
     const settingValue = ctx.message.text;
     const userId = ctx.from.id;
-    const index = parseInt(ctx.session.nextAction.split(":")[1]);
-    const values = (await getSettingValue(userId, settingName))
-      ? await getSettingValue(userId, settingName)
-      : defaultValues;
+    const oldVal = ctx.session.nextAction.split(":")[1]
+    const values = (await userActions.getUserSettingValue(userId, settingName))
+      ? await userActions.getUserSettingValue(userId, settingName)
+      : ['0.1', '0.2', '0.5', '1', '2', '5'];
     ctx.session.userMsgId = ctx.msgId;
     if (
       !isNaN(settingValue) &&
@@ -77,7 +73,7 @@ buySettingScene.on("message", async (ctx) => {
     ) {
       ctx.deleteMessage(ctx.session.botMessageId);
       ctx.deleteMessage(ctx.session.userMsgId);
-      await updateSetting(userId, settingName, settingValue, index);
+      await updateSetting(userId, settingName, values, oldVal, settingValue);
       ctx.session.nextAction = null;
       ctx.session.botMessageId = null;
       ctx.session.userMsgId = null;
@@ -102,32 +98,13 @@ buySettingScene.action("close", (ctx) => {
   ctx.deleteMessage();
 });
 
-async function updateSetting(userId, settingName, settingValue, index) {
+async function updateSetting(userId, settingName, values, oldVal,newValue) {
   try {
-    let user = await User.findOne({ id: userId });
-    if (!user) {
-      let settingsArray = [...defaultValues];
-      settingsArray[index] = settingValue;
-      user = new User({
-        userId: userId,
-        settings: [{ name: settingName, value: settingsArray }],
-      });
-    } else {
-      const settingIndex = user.settings.findIndex(
-        (s) => s.name === settingName
-      );
-      if (settingIndex !== -1) {
-        let settingsArray = [...user.settings[settingIndex].value];
-        settingsArray[index] = settingValue;
-        settingsArray.sort((a, b) => parseFloat(a) - parseFloat(b));
-        user.settings[settingIndex].value = settingsArray;
-      } else {
-        let settingsArray = [...defaultValues];
-        settingsArray[index] = settingValue;
-        user.settings.push({ name: settingName, value: settingsArray });
-      }
-    }
-    await user.save();
+    console.log(values)
+    var index = values.indexOf(oldVal)
+    values[index] = newValue
+    values.sort((a, b) => {return parseFloat(a) - parseFloat(b)});
+    userActions.updateUserSetting(userId, settingName, values);
     console.log("Setting updated for user");
   } catch (error) {
     console.error("Error updating setting:", error);

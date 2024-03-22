@@ -49,7 +49,7 @@ async function submitSwapTxV3(addressToken0, pair, fee, amountIn, account) {
           deadline: deadline,
           amountIn: amountIn,
           //manage slippage better
-          amountOutMinimum: 0,
+          amountOutMinimum: amountOutMinimum,
           sqrtPriceLimitX96: 0,
         },
       ],
