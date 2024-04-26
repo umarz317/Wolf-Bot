@@ -184,7 +184,6 @@ Object.keys(walletOptions).forEach((setting) => {
     var fromDb = await userActions.getUserSettingValue(userId, setting);
     //defaults to zero if not set
     fromDb = fromDb ? fromDb : 0;
-    console.log(fromDb)
     ctx.session.walletsetting = fromDb;
     const userWallets = await userActions.getAllUserWallets(userId);
     if (userWallets && userWallets.length > 0) {
