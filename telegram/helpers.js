@@ -11,7 +11,7 @@ async function onMessage(ctx, settingsOptions) {
       const userId = ctx.from.id;
       ctx.deleteMessage(ctx.session.botMessageId);
       ctx.deleteMessage(ctx.session.userMsgId);
-      const { previousValue } = await updateSetting(
+      const { previousValue } = await userActions.updateUserSetting(
         userId,
         settingType,
         settingValue
@@ -42,7 +42,7 @@ async function onMessage(ctx, settingsOptions) {
 }
 async function onSelectingOption(ctx, option, settingsOptions) {
   let sentMessage;
-  const value = await getSettingValue(ctx.from.id, option);
+  const value = await userActions.getUserSettingValue(ctx.from.id, option);
   if (value)
     sentMessage = await ctx.reply(
       `Current value: ${value}.\nEnter the value for ${settingsOptions[option].name} in format: ${settingsOptions[option].format}.`
@@ -69,7 +69,6 @@ async function getPresetButtons(userId){
   const buttons = values.map((value) =>
     Markup.button.callback(`Buy ${value} Eth`, `preset:${value}`)
   );
-  console.log(buttons);
   return buttons
 }
 

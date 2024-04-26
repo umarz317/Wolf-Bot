@@ -8,7 +8,7 @@ gasSettingScene.enter((ctx) => {
     Markup.inlineKeyboard([
       [Markup.button.callback("⚡ Auto Snipe Tip", "autoSnipeTip")],
       // [Markup.button.callback('🔁 First Bundle Backup Tip', 'firstBundleBackupTip')],
-      [Markup.button.callback("💸 Buy Gwei", "buyGwei")],
+      [Markup.button.callback("💸 Manual Buy Gwei", "buyGwei")],
       // [Markup.button.callback('✅ Approve Gwei', 'approveGwei')],
       // [Markup.button.callback('💰 Sell Gwei', 'sellGwei')],
       // [Markup.button.callback('🛡 Anti Rug Gwei', 'antiRugGwei')],

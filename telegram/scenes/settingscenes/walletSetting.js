@@ -1,31 +1,37 @@
 const { Markup, Scenes } = require("telegraf");
 const walletSettingScene = new Scenes.BaseScene("walletSettingScene");
 const userActions = require("../../../utils/userActions");
-walletSettingScene.enter((ctx) => {
-  ctx.reply(
-    "Wallet Setting Options:",
-    Markup.inlineKeyboard([
-      [Markup.button.callback("🔧 Wallet Setup", "walletSetup")],
-      // [Markup.button.callback("🔐 Default Wallet", "defaultWallet")],
+const helper = require("../../../utils/helpers");
+const keyManagement = require('../../../utils/keyManagement')
+
+walletSettingScene.enter(async (ctx) => {
+  var text = await fetchAllwalletsWithBalance(ctx);
+  ctx.reply(text, {
+    parse_mode: "MarkdownV2",
+    link_preview_options: { is_disabled: true },
+    ...Markup.inlineKeyboard([
+      [Markup.button.callback("🔨 Create", "createWallet")],
+      [Markup.button.callback("🔑 Import Existing Wallet", "importWallet")],
       [
         Markup.button.callback(
-          "🎯 Default Auto Sniper Wallet",
-          "defaultAutoSniperWallet"
+          "👉 Set Default Wallet",
+          "setDefaultWallet"
         ),
       ],
-      [
-        Markup.button.callback(
-          "👛 Default Manual Buyer Wallets",
-          "defaultManualBuyerWallets"
-        ),
-      ],
+      // [
+      //   Markup.button.callback(
+      //     "👛 Default Manual Buyer Wallets",
+      //     "defaultManualBuyerWallets"
+      //   ),
+      // ],
+      [Markup.button.callback('🗝️ Retrieve Private Keys','retrievePK')],
       [Markup.button.callback("🗑 Delete Wallet", "deleteWallet")],
       [
         Markup.button.callback("🔙 Back", "back"),
         Markup.button.callback("❌ Close", "close"),
       ],
-    ])
-  );
+    ]),
+  });
 });
 walletSettingScene.action("walletSetup", (ctx) => {
   ctx.reply("Wallet Setup", {
@@ -41,12 +47,31 @@ walletSettingScene.action("walletSetup", (ctx) => {
   });
 });
 
+async function fetchAllwalletsWithBalance(ctx) {
+  const userId = ctx.from.id;
+  const userWallets = await userActions.getAllUserWallets(userId);
+  var text = "";
+  if (userWallets && userWallets.length > 0) {
+    var index = 1;
+    for (const wallet of userWallets) {
+      var balance = await helper.fetchUserBalance(wallet.address);
+      text += `${index++}: [Balance](${
+        "basescan.org/address/" + wallet.address
+      }) \\- ${balance} Ξ\n\`${wallet.address}\`\n\n`;
+    }
+  } else {
+    text = "No wallets found.";
+  }
+  return text;
+}
+
 walletSettingScene.action("deleteWallet", async (ctx) => {
   ctx.deleteMessage();
   const userId = ctx.from.id;
-  const userWallets = await userActions.getAllUserWallets(userId)
-  if (userWallets && userWallets.wallets.length > 0) {
-    const walletButtons = userWallets.wallets.map((wallet, index) => [
+  const userWallets = await userActions.getAllUserWallets(userId);
+  console.log(userWallets)
+  if (userWallets && userWallets.length > 0) {
+    const walletButtons = userWallets.map((wallet, index) => [
       Markup.button.callback(wallet.address, `confirmDelete:${index}`),
     ]);
     ctx.reply(
@@ -64,6 +89,45 @@ walletSettingScene.action("deleteWallet", async (ctx) => {
   }
 });
 
+walletSettingScene.action("retrievePK", async (ctx) => {
+  ctx.deleteMessage();
+  const userId = ctx.from.id;
+  const userWallets = await userActions.getAllUserWallets(userId);
+  console.log(userWallets)
+  if (userWallets && userWallets.length > 0) {
+    const walletButtons = userWallets.map((wallet, index) => [
+      Markup.button.callback(wallet.address, `getPK:${index}`),
+    ]);
+    ctx.reply(
+      "Select a wallet to retrieve key:",
+      Markup.inlineKeyboard([
+        ...walletButtons,
+        [
+          Markup.button.callback("🔙 Back", "back"),
+          Markup.button.callback("❌ Close", "close"),
+        ],
+      ])
+    );
+  } else {
+    ctx.reply("No wallets found.");
+  }
+});
+walletSettingScene.action(/^getPK:(\d+)$/, async (ctx) => {
+  const index = parseInt(ctx.match[1]);
+  const userId = ctx.from.id;
+  const userWallets = await userActions.getAllUserWallets(userId);
+  try {
+    if (userWallets && userWallets.length > 0) {
+      ctx.reply(
+        `*Address:* ${userWallets[index].address}\n*Private Key:*\n\`${keyManagement.decrypt(userWallets[index].privateKey)}\`
+        `,{parse_mode:'MarkdownV2'}
+      )
+    }
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 walletSettingScene.action(/^confirmDelete:(\d+)$/, async (ctx) => {
   const walletIdToDelete = parseInt(ctx.match[1]);
   ctx.session.walletIndex =
@@ -71,8 +135,8 @@ walletSettingScene.action(/^confirmDelete:(\d+)$/, async (ctx) => {
   const userId = ctx.from.id;
   const userWallets = await userActions.getAllUserWallets(userId);
   try {
-    if (userWallets && userWallets.wallets.length > 0) {
-      const updatedButtons = userWallets.wallets.map((wallet, index) => [
+    if (userWallets && userWallets.length > 0) {
+      const updatedButtons = userWallets.map((wallet, index) => [
         Markup.button.callback(
           index === ctx.session.walletIndex
             ? `✅ ${wallet.address}`
@@ -104,12 +168,12 @@ walletSettingScene.action(/^delete:(\d+)$/, async (ctx) => {
   ctx.deleteMessage();
   const indexToDelete = parseInt(ctx.match[1]);
   const userId = ctx.from.id;
-  await userActions.deleteUserWallet(userId,indexToDelete)
+  await userActions.deleteUserWallet(userId, indexToDelete);
   ctx.reply("Wallet deleted successfully.");
 });
 
 const walletOptions = {
-  defaultAutoSniperWallet: { name: "Default Auto Sniper Wallet" },
+  setDefaultWallet: { name: "Set Default Wallet" },
   defaultManualBuyerWallets: { name: "Default Manual Buyer Wallets" },
 };
 
@@ -120,10 +184,11 @@ Object.keys(walletOptions).forEach((setting) => {
     var fromDb = await userActions.getUserSettingValue(userId, setting);
     //defaults to zero if not set
     fromDb = fromDb ? fromDb : 0;
+    console.log(fromDb)
     ctx.session.walletsetting = fromDb;
     const userWallets = await userActions.getAllUserWallets(userId);
-    if (userWallets && userWallets.wallets.length > 0) {
-      const walletButtons = userWallets.wallets.map((wallet, index) => [
+    if (userWallets && userWallets.length > 0) {
+      const walletButtons = userWallets.map((wallet, index) => [
         Markup.button.callback(
           index === ctx.session.walletsetting
             ? `✅ ${wallet.address}`
@@ -156,8 +221,8 @@ Object.keys(walletOptions).forEach((setting) => {
     userActions.updateUserSetting(userId, setting, walletIndex);
     const userWallets = await userActions.getAllUserWallets(userId);
     try {
-      if (userWallets && userWallets.wallets.length > 0) {
-        const updatedButtons = userWallets.wallets.map((wallet, index) => [
+      if (userWallets && userWallets.length > 0) {
+        const updatedButtons = userWallets.map((wallet, index) => [
           Markup.button.callback(
             index === ctx.session.walletsetting
               ? `✅ ${wallet.address}`

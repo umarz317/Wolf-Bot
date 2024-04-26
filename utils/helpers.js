@@ -1,4 +1,4 @@
-const { isAddress } = require("viem");
+const { isAddress, formatEther } = require("viem");
 const contractHelper = require("./contractHelper");
 const { bot } = require("../telegram/bot");
 const { privateKeyToAddress } = require("viem/accounts");
@@ -38,7 +38,6 @@ async function isERC20(token) {
 }
 
 async function getPair(address0, client, type) {
-  console.log(type)
 // TODO: Add enums for type/make a constants file for all the strings
   if (type === "sushi V2") {
     var contract = contractHelper.getSushiFactoryV2(client);
@@ -60,7 +59,13 @@ async function fetchTokenDecimals(address) {
   return decimals;
 }
 
+async function fetchUserBalance(address) {
+  var balance = await publicClient.getBalance({address:address});
+  return formatEther(balance);
+}
+
 module.exports = {
+  fetchUserBalance,
   isValidPrivateKey,
   isValidAddress,
   isERC20,

@@ -26,30 +26,7 @@ bot.use(stage.middleware());
 // Start command
 bot.start(async (ctx) => {
   console.log("Chat ID: ", ctx.chat.id);
-  const res = await userActions.doesUserWalletExist(ctx.chat.id);
-  if (res) {
-    ctx.reply(`*🎯 Diablo Bot*\n\n*Trade Faster\\!*\n\n`, {
-      parse_mode: "MarkdownV2",
-      ...Markup.inlineKeyboard([
-        [
-          Markup.button.callback("🪪 Create Wallet", "createWallet"),
-          Markup.button.callback("🔑 Import Existing Wallet", "importWallet"),
-        ],
-        [
-          Markup.button.callback("🎯 Snipe", "snipe"),
-          Markup.button.callback("⚙️ Settings", "settings"),
-          Markup.button.callback("💰 Manual Buy", "manualBuy"),
-        ],
-      ]),
-    });
-  } else {
-    ctx.reply(
-      `*🎯 Diablo Bot*\n\n*Trade Faster\\!*\n\nYou have reached wallet creation limit`,
-      {
-        parse_mode: "MarkdownV2",
-      }
-    );
-  }
+  ctx.reply(`*🎯 Diablo Bot*\n\n*Trade Faster\\!*\n\n`)
 });
 
 bot.action("createWallet", async (ctx) => {
@@ -107,6 +84,52 @@ bot.action("cancelImport", (ctx) => {
   ctx.deleteMessage();
   return ctx.scene.leave();
 });
+
+bot.command('settings',(ctx)=>{
+  ctx.scene.enter("settings");
+})
+
+bot.command('positions',(ctx)=>{
+  ctx.reply("⊖ No Positions Yet")
+})
+
+
+
+bot.command("menu", (ctx) => {
+  ctx.reply(`*🎯 Diablo Bot*\n\n*Trade Faster\\!*\n\n`, {
+    parse_mode: "MarkdownV2",
+    ...Markup.inlineKeyboard([
+      [
+        Markup.button.callback("🎯 Snipe", "snipe"),
+        Markup.button.callback("💰 Manual Buy", "manualBuy"),
+      ],
+      [
+        Markup.button.callback("📊 Positions", "postions"),
+        Markup.button.callback("🕵️ Copy Trading", "manualBuy"),
+      ],
+      [
+        Markup.button.callback("🕣 Pending Orders", "pendingOrders"),
+        Markup.button.callback("⚙️ Settings", "settings"),
+      ],
+      [
+        Markup.button.callback("💲 Refer & Earn", "snipe"),
+        Markup.button.callback("🔠 Languages", "manualBuy"),
+      ],
+    ]),
+  });
+})
+
+bot.command("wallets",(ctx)=>{
+  ctx.scene.enter("walletSettingScene");
+})
+
+bot.action("pendingOrders",(ctx)=>{
+  ctx.reply("⊖ No Pending Orders")
+})
+
+bot.action("positions",(ctx)=>{
+  ctx.reply("⊖ No Positions Yet")
+})
 
 function start() {
   try {

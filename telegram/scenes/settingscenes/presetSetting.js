@@ -100,7 +100,6 @@ buySettingScene.action("close", (ctx) => {
 
 async function updateSetting(userId, settingName, values, oldVal,newValue) {
   try {
-    console.log(values)
     var index = values.indexOf(oldVal)
     values[index] = newValue
     values.sort((a, b) => {return parseFloat(a) - parseFloat(b)});
