@@ -1,4 +1,4 @@
-const { isAddress, formatEther } = require("viem");
+const { isAddress, formatEther, parseEther } = require("viem");
 const contractHelper = require("./contractHelper");
 const { bot } = require("../telegram/bot");
 const { privateKeyToAddress } = require("viem/accounts");

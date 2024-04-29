@@ -55,6 +55,7 @@ async function fetchAllwalletsWithBalance(ctx) {
     var index = 1;
     for (const wallet of userWallets) {
       var balance = await helper.fetchUserBalance(wallet.address);
+      balance = balance.replace('.','\\.')
       text += `${index++}: [Balance](${
         "basescan.org/address/" + wallet.address
       }) \\- ${balance} Ξ\n\`${wallet.address}\`\n\n`;
