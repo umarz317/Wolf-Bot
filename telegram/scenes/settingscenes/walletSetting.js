@@ -62,7 +62,7 @@ async function fetchAllwalletsWithBalance(ctx) {
       }) \\- ${balance} Ξ\n\`${wallet.address}\`\n\n`;
     }
   } else {
-    text = "*No wallets found\.*";
+    text = "*No wallets found\\.*";
   }
   return text;
 }
