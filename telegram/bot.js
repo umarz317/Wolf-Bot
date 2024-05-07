@@ -39,7 +39,7 @@ bot.action("createWallet", async (ctx) => {
     if (success) {
       ctx.reply(
         `✅ Successfully Created Wallet\n
-    \n⚠️ Save your private key\\. If you delete this message\\, you can view it again in the settings\\.\n\n💡 Private key: \'${pk}\'\n\n📝 Address: \n${address}`,
+    \n⚠️ Save your private key\\. If you delete this message\\, you can view it again in the settings\\.\n\n💡 Private key: \`${pk}\` \n\n📝 Address: \n${address}`,
         {
           parse_mode: "MarkdownV2",
         }
