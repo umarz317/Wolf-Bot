@@ -26,7 +26,7 @@ bot.use(stage.middleware());
 // Start command
 bot.start(async (ctx) => {
   console.log("Chat ID: ", ctx.chat.id);
-  ctx.reply(`*🎯 Diablo Bot*\n\n*Trade Faster\\!*\n\n`)
+  ctx.reply(`*🎯 Diablo Bot*\n\n*Trade Faster\\!*\n\n`,{parse_mode:'MarkdownV2'})
 });
 
 bot.action("createWallet", async (ctx) => {
