@@ -1,4 +1,5 @@
-require("dotenv").config();
+require("dotenv").config({override:true});
+// require("dotenv")
 const { Telegraf, Markup, Scenes, session } = require("telegraf");
 const { Stage } = Scenes;
 const userActions = require("../utils/userActions");
@@ -105,7 +106,7 @@ bot.command("menu", (ctx) => {
       ],
       [
         Markup.button.callback("📊 Positions", "postions"),
-        Markup.button.callback("🕵️ Copy Trading", "manualBuy"),
+        Markup.button.callback("🕵️ Copy Trading", "copyTrading"),
       ],
       [
         Markup.button.callback("🕣 Pending Orders", "pendingOrders"),
@@ -121,6 +122,10 @@ bot.command("menu", (ctx) => {
 
 bot.command("wallets",(ctx)=>{
   ctx.scene.enter("walletSettingScene");
+})
+
+bot.action("copyTrading",(ctx)=>{
+  ctx.reply("⚠️ Coming Soon!")
 })
 
 bot.action("pendingOrders",(ctx)=>{

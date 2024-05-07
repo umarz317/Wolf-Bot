@@ -6,6 +6,7 @@ const keyManagement = require('../../../utils/keyManagement')
 
 walletSettingScene.enter(async (ctx) => {
   var text = await fetchAllwalletsWithBalance(ctx);
+  console.log(text);
   ctx.reply(text, {
     parse_mode: "MarkdownV2",
     link_preview_options: { is_disabled: true },
@@ -61,7 +62,7 @@ async function fetchAllwalletsWithBalance(ctx) {
       }) \\- ${balance} Ξ\n\`${wallet.address}\`\n\n`;
     }
   } else {
-    text = "No wallets found.";
+    text = "*No wallets found\.*";
   }
   return text;
 }

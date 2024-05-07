@@ -1,7 +1,7 @@
 const { createPublicClient, http, createWalletClient } = require("viem");
 const { privateKeyToAccount } = require("viem/accounts");
 const { polygon, sepolia, base } = require("viem/chains");
-require("dotenv").config();
+// require("dotenv").config();
 const keyManagement = require("./keyManagement");
 
 const publicClient = createPublicClient({

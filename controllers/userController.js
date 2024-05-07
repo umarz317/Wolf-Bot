@@ -78,6 +78,9 @@ module.exports = {
   },
   getAllUserWallets: async (id) => {
     const user = await User.findOne({ id: id });
+    if (!user) {
+      return [];
+    }
     return user.wallets;
   },
   getAllUsers: async () => {

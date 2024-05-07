@@ -53,6 +53,7 @@ const importWalletScene = new WizardScene(
 const snipeScene = new WizardScene(
   "snipe",
   (ctx) => {
+    ctx.reply("🎯 Snipe\n\n🔍 To cancel use /cancel");
     ctx.reply("➡️Enter the token address you want to snipe:");
     return ctx.wizard.next();
   },
@@ -144,6 +145,11 @@ settingScene.action("close", (ctx) => {
   ctx.deleteMessage();
   ctx.scene.leave();
 });
+
+snipeScene.command('cancel', (ctx) => {
+  ctx.reply("❌ Snipe cancelled.");
+  ctx.scene.leave();
+})
 
 module.exports = {
   importWalletScene,

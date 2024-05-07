@@ -8,23 +8,13 @@ const manualBuyer = require("../handler")
 const manualBuyScene = new WizardScene(
   "manualBuy",
   (ctx) => {
+    ctx.reply("📈 Manual Buy\n\n🔍 To cancel use /cancel");
     ctx.reply("➡️ Enter the token address you want to Buy:");
     return ctx.wizard.next();
   },
-  (ctx) => {
-    const token = ctx.message.text;
-    ctx.session.messages = [token];
-    ctx.reply(
-      "Select Swap Type:",
-      Markup.inlineKeyboard([
-        [Markup.button.callback("🍣 Sushiswap V2", "swapType-sushi V2")],
-        [Markup.button.callback("🦄 Uniswap V2", "swapType-uni V2")],
-// TODO: Implement asking fee or trying to get pair for all fee and then ask user to select
-        // [Markup.button.callback("🦄 Uniswap V3", "swapType-uni V3")],
-      ])
-    );
-  },
   async (ctx) => {
+    var token = ctx.message.text;
+    ctx.session.messages = [token];
     ctx.reply("🔃Checking address.....");
     token = ctx.session.messages[0];
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -48,8 +38,15 @@ const manualBuyScene = new WizardScene(
     }
     ctx.reply("✅ Token address is valid.");
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    ctx.wizard.next();
-    return ctx.wizard.steps[ctx.wizard.cursor](ctx);
+    ctx.reply(
+      "Select Swap Type:",
+      Markup.inlineKeyboard([
+        [Markup.button.callback("🍣 Sushiswap V2", "swapType-sushi V2")],
+        [Markup.button.callback("🦄 Uniswap V2", "swapType-uni V2")],
+// TODO: Implement asking fee or trying to get pair for all fee and then ask user to select
+        // [Markup.button.callback("🦄 Uniswap V3", "swapType-uni V3")],
+      ])
+    );
   },
   async (ctx) => {
     const userId = ctx.from.id;
@@ -80,6 +77,12 @@ manualBuyScene.action(/^preset/, async (ctx) => {
   }
   ctx.reply("✅ Pair found.");
   const wallet = await userActions.getAllUserWallets(ctx.chat.id);
+  console.log(wallet)
+  if (!wallet || wallet.length === 0) {
+    ctx.reply("❌ No wallets found, Please import/create a wallet first.");
+    ctx.scene.leave();
+    return;
+  }
   var defaultWalletIndex = await userActions.getUserSettingValue(
     ctx.chat.id,
     "defaultManualBuyerWallets"
@@ -133,5 +136,10 @@ function pairChunk(arr) {
   }
   return temp;
 }
+
+manualBuyScene.command("cancel", (ctx) => {
+  ctx.reply("❌ Cancelled.");
+  ctx.scene.leave();
+});
 
 module.exports = { manualBuyScene };

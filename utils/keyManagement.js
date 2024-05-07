@@ -1,4 +1,4 @@
-require("dotenv").config();
+// require("dotenv").config();
 const crypto = require("crypto");
 
 function generateIV() {
