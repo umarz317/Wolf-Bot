@@ -7,7 +7,7 @@ chainSettingScene.enter(async (ctx) => {
   ctx.session.selectedChains = chain || {};
   ctx.reply(
     "Select blockchains :",
-// TODO: Setup config and add chain in config
+    // TODO: Setup config and add chain in config
     Markup.inlineKeyboard([
       [
         Markup.button.callback(
@@ -65,6 +65,9 @@ chainSettingScene.action("back", (ctx) => {
   ctx.deleteMessage();
   ctx.scene.enter("settings");
 });
-chainSettingScene.action("close", (ctx) => ctx.deleteMessage());
+chainSettingScene.action("close", (ctx) => {
+  ctx.deleteMessage();
+  ctx.scene.leave()
+});
 
 module.exports = { chainSettingScene };

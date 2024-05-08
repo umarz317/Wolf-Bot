@@ -54,7 +54,7 @@ async function fetchAllwalletsWithBalance(ctx) {
       balance = balance.replace(".", "\\.");
       text += `${index++}: [Balance](${
         "basescan.org/address/" + wallet.address
-      }) \\- ${balance} Ξ\n\`${wallet.address}\`\n\n`;
+      }) \\: ${balance} Ξ\n\`${wallet.address}\`\n\n`;
     }
   } else {
     text = "*No wallets found\\.*";
@@ -250,16 +250,18 @@ Object.keys(walletOptions).forEach((setting) => {
 
 walletSettingScene.action("backToWalletSetting", (ctx) => {
   ctx.deleteMessage();
+  ctx.scene.leave();
   ctx.scene.enter("walletSettingScene");
 });
 walletSettingScene.action("back", (ctx) => {
   ctx.deleteMessage();
+  ctx.scene.leave();
   ctx.scene.enter("settings");
 });
 
 walletSettingScene.action("close", (ctx) => {
   ctx.deleteMessage();
-  ctx.scene.leave()
+  ctx.scene.leave();
 });
 
 module.exports = { walletSettingScene };

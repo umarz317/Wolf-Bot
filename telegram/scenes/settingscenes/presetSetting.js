@@ -28,6 +28,7 @@ presetSettingScene.action("back", (ctx) => {
 
 presetSettingScene.action("close", (ctx) => {
   ctx.deleteMessage();
+  return ctx.scene.leave();
 });
 const buySettingScene = new Scenes.BaseScene("presetSettingScene");
 
@@ -58,6 +59,7 @@ buySettingScene.action(/^preset:(([0-9]*[.])?\d+)$/, async (ctx) => {
 });
 
 buySettingScene.on("message", async (ctx) => {
+  console.log('hmmmm from preset');
   if (ctx.session.nextAction && ctx.message.text && ctx.session.nextAction) {
     const settingValue = ctx.message.text;
     const userId = ctx.from.id;
@@ -91,11 +93,13 @@ buySettingScene.on("message", async (ctx) => {
 
 buySettingScene.action("back", (ctx) => {
   ctx.deleteMessage();
+  ctx.scene.leave()
   ctx.scene.enter("initialPresetSettingScene");
 });
 
 buySettingScene.action("close", (ctx) => {
   ctx.deleteMessage();
+  ctx.scene.leave()
 });
 
 async function updateSetting(userId, settingName, values, oldVal,newValue) {

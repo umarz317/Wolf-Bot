@@ -73,6 +73,8 @@ safetySettingScene.action("back", (ctx) => {
   ctx.deleteMessage();
   ctx.scene.enter("settings");
 });
-safetySettingScene.action("close", (ctx) => ctx.deleteMessage());
+safetySettingScene.action("close", (ctx) => {ctx.deleteMessage()
+  ctx.scene.leave()
+});
 
 module.exports = { safetySettingScene };
