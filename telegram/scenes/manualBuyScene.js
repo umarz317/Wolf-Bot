@@ -28,7 +28,8 @@ const manualBuyScene = new WizardScene(
       );
       return;
     }
-    if (!(await helpers.isERC20(token))) {
+    var tokenInfo = await helpers.isERC20(token);
+    if (tokenInfo === false) {
       ctx.reply(
         "❌ Invalid token address, the address is not a ERC20 token.",
         Markup.inlineKeyboard([
@@ -38,6 +39,7 @@ const manualBuyScene = new WizardScene(
       return;
     }
     ctx.reply("✅ Token address is valid.");
+    ctx.reply(`Token Info:\n\nName: ${tokenInfo[0]}\nSymbol: ${tokenInfo[1]}\nDecimals: ${tokenInfo[2]}`)
     await new Promise((resolve) => setTimeout(resolve, 1000));
     ctx.reply(
       "Select Swap Type:",
@@ -117,7 +119,6 @@ const manualBuyScene = new WizardScene(
       manualBuyer.V2(
         ctx.chat.id,
         ctx.session.messages[0],
-        pair,
         value,
         wallet[defaultWalletIndex],
         "Buy"

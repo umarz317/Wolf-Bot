@@ -25,12 +25,12 @@ async function isERC20(token) {
   //logic needs improvement maybe add interface check for(erc165)
   var contract = contractHelper.getToken(token);
   try {
-    await Promise.all([
+    var res = await Promise.all([
       contract.read.name(),
       contract.read.symbol(),
       contract.read.decimals(),
     ]);
-    return true;
+    return res;
   } catch (e) {
     console.log(e);
     return false;
@@ -56,6 +56,7 @@ function sendMessage(chatID, message) {
 
 async function fetchTokenDecimals(address) {
   var decimals = await contractHelper.getToken(address).read.decimals();
+  console.log("Decimals", decimals);
   return decimals;
 }
 

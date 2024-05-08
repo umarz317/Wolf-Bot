@@ -7,7 +7,10 @@ module.exports = {
   V2: async (chat_ID, tokenToSnipe, amountIn, account, type) => {
     amountIn = parseEther(amountIn).toString();
     const txHash = await submitTX.V2(tokenToSnipe, amountIn, account);
-    if (!txHash) return;
+    if (txHash.error){
+      bot.telegram.sendMessage(chat_ID, `❌ ${type} Failed\n\n🎯 Token: ${tokenToSnipe}\n\n💰 Amount: ${formatEther(amountIn)}\n\n Reason: ${txHash.error}`)
+      return
+    };
     bot.telegram.sendMessage(
       chat_ID,
       `Tx submitted: ${txHash}`
