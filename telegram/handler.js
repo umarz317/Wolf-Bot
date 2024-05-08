@@ -93,7 +93,8 @@ module.exports = {
     tokenToSnipe,
     pair,
     amountIn,
-    account
+    account,
+    type
   ) => {
     amountIn = parseEther(amountIn)
     const txHash = await submitTX.sushiV2(
@@ -102,6 +103,7 @@ module.exports = {
       tokenToSnipe,
       account
     );
+    console.log(txHash.error,'here')
     if (txHash.error){
       var errMsg = txHash.error.message.split('Details:')
       bot.telegram.sendMessage(

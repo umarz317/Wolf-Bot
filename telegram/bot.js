@@ -97,6 +97,7 @@ bot.command('positions',(ctx)=>{
 
 
 bot.command("menu", (ctx) => {
+  console.log('Menu Command...')
   ctx.reply(`*🎯 Diablo Bot*\n\n*Trade Faster\\!*\n\n`, {
     parse_mode: "MarkdownV2",
     ...Markup.inlineKeyboard([

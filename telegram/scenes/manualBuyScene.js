@@ -1,10 +1,11 @@
 const { WizardScene } = require("telegraf/scenes");
 const helpers = require("../../utils/helpers");
-const settingsHelpers = require('../helpers')
+const settingsHelpers = require("../helpers");
 const { Markup } = require("telegraf");
 const client = require("../../utils/client");
-const userActions = require('../../utils/userActions')
-const manualBuyer = require("../handler")
+const userActions = require("../../utils/userActions");
+const manualBuyer = require("../handler");
+const { isAddressEqual } = require("viem");
 const manualBuyScene = new WizardScene(
   "manualBuy",
   (ctx) => {
@@ -43,7 +44,7 @@ const manualBuyScene = new WizardScene(
       Markup.inlineKeyboard([
         [Markup.button.callback("🍣 Sushiswap V2", "swapType-sushi V2")],
         [Markup.button.callback("🦄 Uniswap V2", "swapType-uni V2")],
-// TODO: Implement asking fee or trying to get pair for all fee and then ask user to select
+        // TODO: Implement asking fee or trying to get pair for all fee and then ask user to select
         // [Markup.button.callback("🦄 Uniswap V3", "swapType-uni V3")],
       ])
     );
@@ -52,9 +53,88 @@ const manualBuyScene = new WizardScene(
     const userId = ctx.from.id;
     var buttons = await settingsHelpers.getPresetButtons(userId);
     ctx.reply(
-      "Select a Preset amount to Buy:",
-      Markup.inlineKeyboard([...pairChunk(buttons)])
+      "Select a Preset amount to Buy or Type:",
+      Markup.inlineKeyboard([
+        ...pairChunk(buttons),
+        [Markup.button.callback("Custom", "preset:custom")],
+      ])
     );
+  },
+  async (ctx) => {
+    var text = ctx.message?.text;
+    if (ctx.session.value === "custom") {
+      ctx.session.value = text;
+    }
+    ctx.wizard.next();
+    return ctx.wizard.steps[ctx.wizard.cursor](ctx);
+  },
+  async (ctx) => {
+    var value = ctx.session.value;
+    ctx.reply("🔃Fetching Pair.....");
+    const pair = await helpers.getPair(
+      ctx.session.messages[0],
+      client.publicClient,
+      ctx.session.swapType
+    );
+    console.log("Pair", pair);
+    if (
+      pair === undefined ||
+      isAddressEqual(pair, "0x0000000000000000000000000000000000000000")
+    ) {
+      ctx.reply(
+        "❌ Pair not found.",
+        Markup.inlineKeyboard([
+          Markup.button.callback("❌ Cancel Buy", "cancelBuy"),
+        ])
+      );
+      return;
+    }
+    ctx.reply("✅ Pair found.");
+    const wallet = await userActions.getAllUserWallets(ctx.chat.id);
+    console.log(wallet);
+    if (!wallet || wallet.length === 0) {
+      ctx.reply("❌ No wallets found, Please import/create a wallet first.");
+      ctx.scene.leave();
+      return;
+    }
+    var defaultWalletIndex = await userActions.getUserSettingValue(
+      ctx.chat.id,
+      "defaultManualBuyerWallets"
+    );
+    defaultWalletIndex = defaultWalletIndex ? defaultWalletIndex : 0;
+    console.log(ctx.session.swapType);
+    if (ctx.session.swapType === "sushi V2") {
+      manualBuyer.sushiV2(
+        ctx.chat.id,
+        ctx.session.messages[0],
+        pair,
+        value,
+        wallet[defaultWalletIndex],
+        "Buy"
+      );
+    } else if (ctx.session.swapType === "uni V2") {
+      console.log(ctx.session.swapType);
+      manualBuyer.V2(
+        ctx.chat.id,
+        ctx.session.messages[0],
+        pair,
+        value,
+        wallet[defaultWalletIndex],
+        "Buy"
+      );
+    } else if (ctx.session.swapType === "uni V3") {
+      console.log(ctx.session.swapType);
+      // manualBuyer.V3(
+      //   ctx.chat.id,
+      //   ctx.session.messages[0],
+      //   pair,
+      //   value,
+      //   wallet[defaultWalletIndex],
+      //   "Buy"
+      // );
+    }
+    ctx.reply("✅ Buy setup complete, We'll buy the token and update you.");
+    ctx.scene.leave();
   }
 );
 
@@ -65,66 +145,17 @@ manualBuyScene.action("cancelBuy", (ctx) => {
 
 manualBuyScene.action(/^preset/, async (ctx) => {
   const value = ctx.callbackQuery.data.split(":")[1];
-  ctx.reply("🔃Fetching Pair.....");
-  const pair = await helpers.getPair(
-    ctx.session.messages[0],
-    client.publicClient,
-    ctx.session.swapType
-  );
-  if (pair === undefined) {
-    ctx.reply("❌ Pair not found.",Markup.inlineKeyboard([Markup.button.callback("❌ Cancel Buy", "cancelBuy")]));
-    return;
+  ctx.session.value = value;
+  if(value==="custom"){
+    ctx.reply("➡️ Enter the amount you want to buy:");
+    return ctx.wizard.next();
   }
-  ctx.reply("✅ Pair found.");
-  const wallet = await userActions.getAllUserWallets(ctx.chat.id);
-  console.log(wallet)
-  if (!wallet || wallet.length === 0) {
-    ctx.reply("❌ No wallets found, Please import/create a wallet first.");
-    ctx.scene.leave();
-    return;
-  }
-  var defaultWalletIndex = await userActions.getUserSettingValue(
-    ctx.chat.id,
-    "defaultManualBuyerWallets"
-  );
-  defaultWalletIndex = defaultWalletIndex ? defaultWalletIndex : 0;
-  console.log(ctx.session.swapType)
-  if (ctx.session.swapType === "sushi V2") {
-    manualBuyer.sushiV2(
-      ctx.chat.id,
-      ctx.session.messages[0],
-      pair,
-      value,
-      wallet[defaultWalletIndex],
-      "Buy"
-    );
-  } else if (ctx.session.swapType === "uni V2") {
-    console.log(ctx.session.swapType)
-    manualBuyer.V2(
-      ctx.chat.id,
-      ctx.session.messages[0],
-      pair,
-      value,
-      wallet[defaultWalletIndex],
-      "Buy"
-    );
-  } else if (ctx.session.swapType === "uni V3") {
-    console.log(ctx.session.swapType)
-    // manualBuyer.V3(
-    //   ctx.chat.id,
-    //   ctx.session.messages[0],
-    //   pair,
-    //   value,
-    //   wallet[defaultWalletIndex],
-    //   "Buy"
-    // );
-  }
-  ctx.reply("✅ Buy setup complete, We'll buy the token and update you.");
-  ctx.scene.leave();
+  ctx.wizard.next();
+  return ctx.wizard.steps[ctx.wizard.cursor](ctx);
 });
 
 manualBuyScene.action(/^swapType/, (ctx) => {
-  ctx.session.swapType = ctx.callbackQuery.data.split('-')[1];
+  ctx.session.swapType = ctx.callbackQuery.data.split("-")[1];
   ctx.wizard.next();
   return ctx.wizard.steps[ctx.wizard.cursor](ctx);
 });
