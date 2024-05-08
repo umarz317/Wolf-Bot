@@ -2,7 +2,7 @@ const { Markup, Scenes } = require("telegraf");
 const walletSettingScene = new Scenes.BaseScene("walletSettingScene");
 const userActions = require("../../../utils/userActions");
 const helper = require("../../../utils/helpers");
-const keyManagement = require('../../../utils/keyManagement')
+const keyManagement = require("../../../utils/keyManagement");
 
 walletSettingScene.enter(async (ctx) => {
   var text = await fetchAllwalletsWithBalance(ctx);
@@ -13,19 +13,14 @@ walletSettingScene.enter(async (ctx) => {
     ...Markup.inlineKeyboard([
       [Markup.button.callback("🔨 Create", "createWallet")],
       [Markup.button.callback("🔑 Import Existing Wallet", "importWallet")],
-      [
-        Markup.button.callback(
-          "👉 Set Default Wallet",
-          "setDefaultWallet"
-        ),
-      ],
+      [Markup.button.callback("👉 Set Default Wallet", "setDefaultWallet")],
       // [
       //   Markup.button.callback(
       //     "👛 Default Manual Buyer Wallets",
       //     "defaultManualBuyerWallets"
       //   ),
       // ],
-      [Markup.button.callback('🗝️ Retrieve Private Keys','retrievePK')],
+      [Markup.button.callback("🗝️ Retrieve Private Keys", "retrievePK")],
       [Markup.button.callback("🗑 Delete Wallet", "deleteWallet")],
       [
         Markup.button.callback("🔙 Back", "back"),
@@ -56,7 +51,7 @@ async function fetchAllwalletsWithBalance(ctx) {
     var index = 1;
     for (const wallet of userWallets) {
       var balance = await helper.fetchUserBalance(wallet.address);
-      balance = balance.replace('.','\\.')
+      balance = balance.replace(".", "\\.");
       text += `${index++}: [Balance](${
         "basescan.org/address/" + wallet.address
       }) \\- ${balance} Ξ\n\`${wallet.address}\`\n\n`;
@@ -71,7 +66,7 @@ walletSettingScene.action("deleteWallet", async (ctx) => {
   ctx.deleteMessage();
   const userId = ctx.from.id;
   const userWallets = await userActions.getAllUserWallets(userId);
-  console.log(userWallets)
+  console.log(userWallets);
   if (userWallets && userWallets.length > 0) {
     const walletButtons = userWallets.map((wallet, index) => [
       Markup.button.callback(wallet.address, `confirmDelete:${index}`),
@@ -95,7 +90,7 @@ walletSettingScene.action("retrievePK", async (ctx) => {
   ctx.deleteMessage();
   const userId = ctx.from.id;
   const userWallets = await userActions.getAllUserWallets(userId);
-  console.log(userWallets)
+  console.log(userWallets);
   if (userWallets && userWallets.length > 0) {
     const walletButtons = userWallets.map((wallet, index) => [
       Markup.button.callback(wallet.address, `getPK:${index}`),
@@ -121,9 +116,14 @@ walletSettingScene.action(/^getPK:(\d+)$/, async (ctx) => {
   try {
     if (userWallets && userWallets.length > 0) {
       ctx.reply(
-        `*Address:* ${userWallets[index].address}\n*Private Key:*\n\`${keyManagement.decrypt(userWallets[index].privateKey)}\`
-        `,{parse_mode:'MarkdownV2'}
-      )
+        `*Address:* ${
+          userWallets[index].address
+        }\n*Private Key:*\n\`${keyManagement.decrypt(
+          userWallets[index].privateKey
+        )}\`
+        `,
+        { parse_mode: "MarkdownV2" }
+      );
     }
   } catch (error) {
     console.log(error);
@@ -257,6 +257,9 @@ walletSettingScene.action("back", (ctx) => {
   ctx.scene.enter("settings");
 });
 
-walletSettingScene.action("close", (ctx) => ctx.deleteMessage());
+walletSettingScene.action("close", (ctx) => {
+  ctx.deleteMessage();
+  ctx.wizard.exit();
+});
 
 module.exports = { walletSettingScene };
