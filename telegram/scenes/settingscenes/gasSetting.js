@@ -102,6 +102,9 @@ gasSettingScene.action("back", (ctx) => {
   ctx.deleteMessage();
   ctx.scene.enter("settings");
 });
-gasSettingScene.action("close", (ctx) => ctx.deleteMessage());
+gasSettingScene.action("close", (ctx) => {
+  ctx.deleteMessage();
+  ctx.scene.leave();
+});
 
 module.exports = { gasSettingScene };
