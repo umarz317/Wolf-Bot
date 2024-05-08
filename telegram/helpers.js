@@ -72,8 +72,19 @@ async function getPresetButtons(userId){
   return buttons
 }
 
+async function getPositionMessage(chatID){
+  var wallets = await userActions.getAllUserWallets(chatID);
+  var positions = await helper.getUserPositions(wallets[0].address);
+  var message = "Positions:\n\n";
+  for (var i = 0; i < positions.result.length; i++) {
+    message += `Token: ${positions.result[i].name}\nAmount: ${positions.result[i].balanceFormatted}\n\n`;
+  }
+  return message;
+}
+
 
 module.exports = {
+  getPositionMessage,
   onMessage,
   onSelectingOption,
   getPresetButtons

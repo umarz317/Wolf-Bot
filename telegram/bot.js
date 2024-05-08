@@ -9,6 +9,8 @@ bot.use(session());
 module.exports = { bot }; //important to keep it here
 const scenes = require("./scenes/sceneMain");
 const helper = require("../utils/helpers");
+const tghelper = require("./helpers");
+
 
 const stage = new Stage([
   scenes.importWalletScene,
@@ -94,12 +96,7 @@ bot.command("settings", (ctx) => {
 
 bot.command("positions", async(ctx) => {
   console.log("Positions Command...");
-  var wallets = await userActions.getAllUserWallets(ctx.chat.id);
-  var positions = await helper.getUserPositions(wallets[0].address);
-  var message = "";
-  for (var i = 0; i < positions.result.length; i++) {
-    message += `Token: ${positions.result[i].name}\nAmount: ${positions[i].balance_formatted}\n\n`;
-  }
+  var message = await tghelper.getPositionMessage(ctx.chat.id)
   ctx.reply(message);
 });
 
@@ -141,14 +138,8 @@ bot.action("pendingOrders", (ctx) => {
 });
 
 bot.action("positions", async (ctx) => {
-  console.log("Positions Command...");
-  var wallets = await userActions.getAllUserWallets(ctx.chat.id);
-  var positions = await helper.getUserPositions(wallets[0].address);
-  var message = "";
-  for (var i = 0; i < positions.result.length; i++) {
-    message += `Token: ${positions.result[i].name}\nAmount: ${positions.result[i].balanceFormatted}\n\n`;
-  }
-  ctx.reply("Positions:\n\n");
+  console.log("Positions action...");
+  var message = await tghelper.getPositionMessage(ctx.chat.id)
   ctx.reply(message);
 });
 
