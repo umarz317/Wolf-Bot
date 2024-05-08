@@ -3,6 +3,7 @@ const contractHelper = require("./contractHelper");
 const { bot } = require("../telegram/bot");
 const { privateKeyToAddress } = require("viem/accounts");
 const { publicClient } = require("./client");
+const Moralis = require("moralis").default;
 
 function isValidPrivateKey(pk) {
   if (!pk.startsWith("0x")) {
@@ -38,7 +39,7 @@ async function isERC20(token) {
 }
 
 async function getPair(address0, client, type) {
-// TODO: Add enums for type/make a constants file for all the strings
+  // TODO: Add enums for type/make a constants file for all the strings
   if (type === "sushi V2") {
     var contract = contractHelper.getSushiFactoryV2(client);
     var pair = await contract.read.getPair([address0, process.env.WETH]);
@@ -61,8 +62,21 @@ async function fetchTokenDecimals(address) {
 }
 
 async function fetchUserBalance(address) {
-  var balance = await publicClient.getBalance({address:address});
+  var balance = await publicClient.getBalance({ address: address });
   return formatEther(balance);
+}
+
+async function getUserPositions(address) {
+  try {
+    const response = await Moralis.EvmApi.wallets.getWalletTokenBalancesPrice({
+      chain: "0x2105",
+      address: address,
+    });
+    console.log(response.result);
+    return response;
+  } catch (e) {
+    console.error(e);
+  }
 }
 
 module.exports = {
@@ -73,4 +87,5 @@ module.exports = {
   sendMessage,
   fetchTokenDecimals,
   getPair,
+  getUserPositions,
 };

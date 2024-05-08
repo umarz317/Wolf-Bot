@@ -1,13 +1,14 @@
-require("dotenv").config({override:true});
+require("dotenv").config({ override: true });
 // require("dotenv")
 const { Telegraf, Markup, Scenes, session } = require("telegraf");
 const { Stage } = Scenes;
 const userActions = require("../utils/userActions");
 const bot = new Telegraf(process.env.BOT_TOKEN);
-
+const Moralis = require("moralis").default;
 bot.use(session());
 module.exports = { bot }; //important to keep it here
 const scenes = require("./scenes/sceneMain");
+const helper = require("../utils/helpers");
 
 const stage = new Stage([
   scenes.importWalletScene,
@@ -27,15 +28,16 @@ bot.use(stage.middleware());
 // Start command
 bot.start(async (ctx) => {
   console.log("Chat ID: ", ctx.chat.id);
-  ctx.reply(`*🎯 Diablo Bot*\n\n*Trade Faster\\!*\n\n`,{parse_mode:'MarkdownV2'})
+  ctx.reply(`*🎯 Diablo Bot*\n\n*Trade Faster\\!*\n\n`, {
+    parse_mode: "MarkdownV2",
+  });
 });
 
 bot.action("createWallet", async (ctx) => {
   var res = await userActions.doesUserWalletExist(ctx.chat.id);
   if (res) {
-    const { address, pk, success } = await userActions.generateAndSaveUserWallet(
-      ctx.chat.id
-    );
+    const { address, pk, success } =
+      await userActions.generateAndSaveUserWallet(ctx.chat.id);
     if (success) {
       ctx.reply(
         `✅ Successfully Created Wallet\n
@@ -86,18 +88,23 @@ bot.action("cancelImport", (ctx) => {
   return ctx.scene.leave();
 });
 
-bot.command('settings',(ctx)=>{
+bot.command("settings", (ctx) => {
   ctx.scene.enter("settings");
-})
+});
 
-bot.command('positions',(ctx)=>{
-  ctx.reply("⊖ No Positions Yet")
-})
-
-
+bot.command("positions", async(ctx) => {
+  console.log("Positions Command...");
+  var wallets = await userActions.getAllUserWallets(ctx.chat.id);
+  var positions = await helper.getUserPositions(wallets[0].address);
+  var message = "";
+  for (var i = 0; i < positions.result.length; i++) {
+    message += `Token: ${positions.result[i].name}\nAmount: ${positions[i].balance_formatted}\n\n`;
+  }
+  ctx.reply(message);
+});
 
 bot.command("menu", (ctx) => {
-  console.log('Menu Command...')
+  console.log("Menu Command...");
   ctx.reply(`*🎯 Diablo Bot*\n\n*Trade Faster\\!*\n\n`, {
     parse_mode: "MarkdownV2",
     ...Markup.inlineKeyboard([
@@ -106,7 +113,7 @@ bot.command("menu", (ctx) => {
         Markup.button.callback("💰 Manual Buy", "manualBuy"),
       ],
       [
-        Markup.button.callback("📊 Positions", "postions"),
+        Markup.button.callback("📊 Positions", "positions"),
         Markup.button.callback("🕵️ Copy Trading", "copyTrading"),
       ],
       [
@@ -119,36 +126,53 @@ bot.command("menu", (ctx) => {
       ],
     ]),
   });
-})
+});
 
-bot.command("wallets",(ctx)=>{
+bot.command("wallets", (ctx) => {
   ctx.scene.enter("walletSettingScene");
-})
+});
 
-bot.action("copyTrading",(ctx)=>{
-  ctx.reply("⚠️ Coming Soon!")
-})
+bot.action("copyTrading", (ctx) => {
+  ctx.reply("⚠️ Coming Soon!");
+});
 
-bot.action("pendingOrders",(ctx)=>{
-  ctx.reply("⊖ No Pending Orders")
-})
+bot.action("pendingOrders", (ctx) => {
+  ctx.reply("⊖ No Pending Orders");
+});
 
-bot.action("positions",(ctx)=>{
-  ctx.reply("⊖ No Positions Yet")
-})
+bot.action("positions", async (ctx) => {
+  console.log("Positions Command...");
+  var wallets = await userActions.getAllUserWallets(ctx.chat.id);
+  var positions = await helper.getUserPositions(wallets[0].address);
+  var message = "";
+  for (var i = 0; i < positions.result.length; i++) {
+    message += `Token: ${positions.result[i].name}\nAmount: ${positions.result[i].balanceFormatted}\n\n`;
+  }
+  ctx.reply("Positions:\n\n");
+  ctx.reply(message);
+});
 
 function start() {
   try {
     bot.launch();
-    console.log("Bot Started...")
+    console.log("Bot Started...");
   } catch {
     console.log("Error Launching Bot!");
   }
 }
 
-function stop(){
+function stop() {
   bot.stop();
   console.log("Bot Stopped...");
 }
+(()=>{
+  try {
+    Moralis.start({
+      apiKey: process.env.MORALIS_API_KEY,
+    });
+  } catch (e) {
+    console.log("Error Starting Moralis", e);
+  }
+})();
 
-module.exports = { start,stop };
+module.exports = { start, stop };
