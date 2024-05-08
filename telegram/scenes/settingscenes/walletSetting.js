@@ -259,7 +259,7 @@ walletSettingScene.action("back", (ctx) => {
 
 walletSettingScene.action("close", (ctx) => {
   ctx.deleteMessage();
-  ctx.wizard.exit();
+  ctx.scene.leave()
 });
 
 module.exports = { walletSettingScene };
