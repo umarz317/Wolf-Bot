@@ -1,5 +1,4 @@
 require("dotenv").config({ override: true });
-// require("dotenv")
 const { Telegraf, Markup, Scenes, session } = require("telegraf");
 const { Stage } = Scenes;
 const userActions = require("../utils/userActions");

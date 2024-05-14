@@ -97,14 +97,7 @@ const manualSellScene = new WizardScene(
       );
     } else if (ctx.session.swapType === "uni V3") {
       console.log(ctx.session.swapType);
-      // manualBuyer.V3(
-      //   ctx.chat.id,
-      //   ctx.session.messages[0],
-      //   pair,
-      //   value,
-      //   wallet[defaultWalletIndex],
-      //   "Buy"
-      // );
+      //TODO: Implement uniswap-v3 sell
     }
     ctx.reply("✅ Sell setup complete, We'll Sell the token and update you.");
     ctx.scene.leave();

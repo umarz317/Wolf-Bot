@@ -68,7 +68,7 @@ async function submitSwapTxV3(addressToken0, pair, fee, amountIn, account) {
 
 async function fetchTokensAndPair(addressToken0, pair, decimals0) {
   const [liquidity] = await getPoolData(pair);
-  var token1 = new Token(ChainId.BASE, "0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14", 18);
+  var token1 = new Token(ChainId.BASE, WETH9[ChainId.BASE], 18);
   var token0 = new Token(ChainId.BASE, addressToken0, decimals0);
   return [token0, token1];
 }

@@ -4,7 +4,7 @@ const app = express();
 require("./config/db");
 
 app.listen(8080, () => {
-  console.log("server started");
+  console.log("Diablo started");
 });
 
 app.get("/", (req, res) => {

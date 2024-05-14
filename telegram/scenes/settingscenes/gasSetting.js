@@ -6,14 +6,9 @@ gasSettingScene.enter((ctx) => {
   ctx.reply(
     "Gas Setting Options:",
     Markup.inlineKeyboard([
+      //Todo: Connect setting to bot.
       [Markup.button.callback("⚡ Auto Snipe Tip", "autoSnipeTip")],
-      // [Markup.button.callback('🔁 First Bundle Backup Tip', 'firstBundleBackupTip')],
       [Markup.button.callback("💸 Manual Buy Gwei", "buyGwei")],
-      // [Markup.button.callback('✅ Approve Gwei', 'approveGwei')],
-      // [Markup.button.callback('💰 Sell Gwei', 'sellGwei')],
-      // [Markup.button.callback('🛡 Anti Rug Gwei', 'antiRugGwei')],
-      // [Markup.button.callback('🔒 Buy Limit Order Gwei', 'buyLimitOrderGwei')],
-      // [Markup.button.callback('📊 Mempool Gwei Limit', 'mempoolGweiLimit')],
       [
         Markup.button.callback("🔙 Back", "back"),
         Markup.button.callback("❌ Close", "close"),

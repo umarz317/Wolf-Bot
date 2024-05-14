@@ -14,12 +14,6 @@ walletSettingScene.enter(async (ctx) => {
       [Markup.button.callback("🔨 Create", "createWallet")],
       [Markup.button.callback("🔑 Import Existing Wallet", "importWallet")],
       [Markup.button.callback("👉 Set Default Wallet", "setDefaultWallet")],
-      // [
-      //   Markup.button.callback(
-      //     "👛 Default Manual Buyer Wallets",
-      //     "defaultManualBuyerWallets"
-      //   ),
-      // ],
       [Markup.button.callback("🗝️ Retrieve Private Keys", "retrievePK")],
       [Markup.button.callback("🗑 Delete Wallet", "deleteWallet")],
       [

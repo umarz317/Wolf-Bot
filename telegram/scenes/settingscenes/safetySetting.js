@@ -1,7 +1,7 @@
 const { Markup, Scenes } = require("telegraf");
 const safetySettingScene = new Scenes.BaseScene("safetySettingScene");
 const { onMessage, onSelectingOption } = require("../../helpers");
-
+//TODO: Connect to Bot, implement tax calculation etc.
 safetySettingScene.enter((ctx) => {
   ctx.reply(
     "Safety Setting Options:",
