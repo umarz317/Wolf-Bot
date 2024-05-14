@@ -1,6 +1,5 @@
 const { WizardScene } = require("telegraf/scenes");
 const helpers = require("../../utils/helpers");
-const settingsHelpers = require("../helpers");
 const { Markup } = require("telegraf");
 const client = require("../../utils/client");
 const userActions = require("../../utils/userActions");
@@ -10,8 +9,8 @@ const manualSellScene = new WizardScene(
   "manualSell",
   (ctx) => {
     ctx.reply("📈 Manual Sell\n\n🔍 To cancel use /cancel");
-    var data = ctx.session.sellData
-    ctx.reply(`Selling Token: ${data.name}`)
+    var data = ctx.session.sellData;
+    ctx.reply(`Selling Token: ${data.name}`);
     ctx.wizard.next();
     return ctx.wizard.steps[ctx.wizard.cursor](ctx);
   },
@@ -19,6 +18,7 @@ const manualSellScene = new WizardScene(
     ctx.reply(
       "Select Swap To Sell On:",
       Markup.inlineKeyboard([
+        // TODO: Implement sell for sushiswapv2
         // [Markup.button.callback("🍣 Sushiswap V2", "swapType-sushi V2")],
         [Markup.button.callback("🦄 Uniswap V2", "swapType-uni V2")],
         // TODO: Implement asking fee or trying to get pair for all fee and then ask user to select
@@ -26,30 +26,18 @@ const manualSellScene = new WizardScene(
       ])
     );
   },
-  async(ctx)=>{
-    ctx.reply('➡️ Enter amount to sell:')
+  (ctx) => {
+    ctx.reply("➡️ Enter amount to sell:");
     return ctx.wizard.next();
-  }
-  // async (ctx) => {
-  //   const userId = ctx.from.id;
-  //   var buttons = await settingsHelpers.getPresetButtons(userId);
-  //   ctx.reply(
-  //     "Select a Preset amount to Buy or Type:",
-  //     Markup.inlineKeyboard([
-  //       ...pairChunk(buttons),
-  //       [Markup.button.callback("Custom", "preset:custom")],
-  //     ])
-  //   );
-  // },
-  ,
-  async (ctx) => {
+  },
+  (ctx) => {
     var amount = ctx.message.text;
-    var data = ctx.session.sellData
-    if(parseFloat(data.balanceFormatted)<=parseFloat(amount)){
-      ctx.reply("Balance Low!")
-      ctx.scene.leave()
+    var data = ctx.session.sellData;
+    if (parseFloat(data.balanceFormatted) <= parseFloat(amount)) {
+      ctx.reply("Balance Low!");
+      ctx.scene.leave();
     }
-    ctx.session.amount = amount
+    ctx.session.amount = amount;
     ctx.wizard.next();
     return ctx.wizard.steps[ctx.wizard.cursor](ctx);
   },
@@ -104,8 +92,8 @@ const manualSellScene = new WizardScene(
         ctx.session.sellData.tokenAddress._value,
         value,
         wallet[defaultWalletIndex],
-        "Sell"
-        ,false
+        "Sell",
+        false
       );
     } else if (ctx.session.swapType === "uni V3") {
       console.log(ctx.session.swapType);
@@ -131,7 +119,7 @@ manualSellScene.action("cancelSell", (ctx) => {
 manualSellScene.action(/^preset/, async (ctx) => {
   const value = ctx.callbackQuery.data.split(":")[1];
   ctx.session.value = value;
-  if(value==="custom"){
+  if (value === "custom") {
     ctx.reply("➡️ Enter the amount you want to Sell:");
     return ctx.wizard.next();
   }
@@ -144,14 +132,6 @@ manualSellScene.action(/^swapType/, (ctx) => {
   ctx.wizard.next();
   return ctx.wizard.steps[ctx.wizard.cursor](ctx);
 });
-
-function pairChunk(arr) {
-  var temp = [];
-  for (var i = 0; i <= arr.length / 2 + 1; i += 2) {
-    temp.push(arr.slice(i, i + 2));
-  }
-  return temp;
-}
 
 manualSellScene.command("cancel", (ctx) => {
   ctx.reply("❌ Cancelled.");

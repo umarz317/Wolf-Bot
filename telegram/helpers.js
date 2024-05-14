@@ -73,14 +73,45 @@ async function getPresetButtons(userId) {
   return buttons;
 }
 
+async function positionHelper(ctx) {
+  console.log("Positions action...");
+  var [messages, positions] = await getPositionMessage(ctx.chat.id);
+  await Promise.resolve(
+    setTimeout((resolve) => {
+      resolve;
+    }, 400)
+  );
+  ctx.session.sellData = positions;
+  messages.map((message, index) => {
+    if (positions[index].nativeToken === true) {
+      return;
+    } else {
+      ctx.reply(message, {
+        parse_mode: "MarkdownV2",
+        ...Markup.inlineKeyboard([
+          Markup.button.callback("💸 Sell", `sellIndex:${index}`),
+        ]),
+      });
+    }
+  });
+}
+
 async function getPositionMessage(chatID) {
   var wallets = await userActions.getAllUserWallets(chatID);
   var positions = await helper.getUserPositions(wallets[0].address);
-  var message = []
+  var message = [];
   for (var i = 0; i < positions.result.length; i++) {
-    message.push(`*Token:* ${positions.result[i].name}\n*Amount:* ${positions.result[i].balanceFormatted.toString().replace(".", "\\.")}\n*USD:* ${positions.result[i].usdValue.toString().replace(".", "\\.")}\\$\n\n`);
+    message.push(
+      `*Token:* ${positions.result[i].name}\n*Amount:* ${positions.result[
+        i
+      ].balanceFormatted
+        .toString()
+        .replace(".", "\\.")}\n*USD:* ${positions.result[i].usdValue
+        .toString()
+        .replace(".", "\\.")}\\$\n\n`
+    );
   }
-  return [message,positions.result];
+  return [message, positions.result];
 }
 
 module.exports = {
@@ -88,4 +119,5 @@ module.exports = {
   onMessage,
   onSelectingOption,
   getPresetButtons,
+  positionHelper
 };

@@ -39,7 +39,9 @@ const manualBuyScene = new WizardScene(
       return;
     }
     ctx.reply("✅ Token address is valid.");
-    ctx.reply(`Token Info:\n\nName: ${tokenInfo[0]}\nSymbol: ${tokenInfo[1]}\nDecimals: ${tokenInfo[2]}`)
+    ctx.reply(
+      `Token Info:\n\nName: ${tokenInfo[0]}\nSymbol: ${tokenInfo[1]}\nDecimals: ${tokenInfo[2]}`
+    );
     await new Promise((resolve) => setTimeout(resolve, 1000));
     ctx.reply(
       "Select Swap Type:",
@@ -62,7 +64,7 @@ const manualBuyScene = new WizardScene(
       ])
     );
   },
-  async (ctx) => {
+  (ctx) => {
     var text = ctx.message?.text;
     if (ctx.session.value === "custom") {
       ctx.session.value = text;
@@ -147,7 +149,7 @@ manualBuyScene.action("cancelBuy", (ctx) => {
 manualBuyScene.action(/^preset/, async (ctx) => {
   const value = ctx.callbackQuery.data.split(":")[1];
   ctx.session.value = value;
-  if(value==="custom"){
+  if (value === "custom") {
     ctx.reply("➡️ Enter the amount you want to buy:");
     return ctx.wizard.next();
   }

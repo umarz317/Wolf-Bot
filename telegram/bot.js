@@ -95,31 +95,9 @@ bot.command("settings", (ctx) => {
 });
 
 bot.command("positions", async (ctx) => {
-  positionHelper(ctx);
-});
-
-async function positionHelper(ctx) {
-  console.log("Positions action...");
-  var [messages, positions] = await tghelper.getPositionMessage(ctx.chat.id);
   ctx.reply("📊 Positions\n\n", { parse_mode: "MarkdownV2" });
-  await Promise.resolve(setTimeout((resolve)=>{resolve},100))
-  ctx.session.sellData = positions
-  messages.map((message, index) => {
-    if (positions[index].nativeToken===true) {
-      return;
-    } else {
-      ctx.reply(message, {
-        parse_mode: "MarkdownV2",
-        ...Markup.inlineKeyboard([
-          Markup.button.callback(
-            "💸 Sell",
-            `sellIndex:${index}`
-          ),
-        ]),
-      });
-    }
-  });
-}
+  tghelper.positionHelper(ctx);
+});
 
 bot.command("menu", (ctx) => {
   console.log("Menu Command...");
@@ -159,11 +137,13 @@ bot.action("pendingOrders", (ctx) => {
 });
 
 bot.action("positions", async (ctx) => {
-  positionHelper(ctx);
+  ctx.reply("📊 Positions\n\n", { parse_mode: "MarkdownV2" });
+  tghelper.positionHelper(ctx);
 });
 
 bot.action(/^sellIndex:/, (ctx) => {
-  ctx.session.sellData = ctx.session.sellData[ctx.callbackQuery.data.split(":")[1]];
+  ctx.session.sellData =
+    ctx.session.sellData[ctx.callbackQuery.data.split(":")[1]];
   ctx.scene.enter("manualSell");
 });
 
