@@ -13,6 +13,7 @@ const {
 const { safetySettingScene } = require("../scenes/settingscenes/safetySetting");
 const { toggleSettingScene } = require("../scenes/settingscenes/toggleSetting");
 const { manualBuyScene } = require("./manualBuyScene");
+const {manualSellScene} = require('./manualSellScene') 
 
 const importWalletScene = new WizardScene(
   "import-wallet",
@@ -163,4 +164,5 @@ module.exports = {
   safetySettingScene,
   toggleSettingScene,
   manualBuyScene,
+  manualSellScene
 };

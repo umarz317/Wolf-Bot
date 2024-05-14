@@ -1,5 +1,5 @@
 const { Markup } = require("telegraf");
-const userActions = require('../utils/userActions');  
+const userActions = require("../utils/userActions");
 const helper = require("../utils/helpers");
 
 async function onMessage(ctx, settingsOptions) {
@@ -57,12 +57,12 @@ async function onSelectingOption(ctx, option, settingsOptions) {
   ctx.session.nextAction = option;
 }
 
-async function getPresetButtons(userId){
+async function getPresetButtons(userId) {
   var defaultValues = ["0.1", "0.2", "0.5", "1", "2", "5"];
-  var user = await userActions.getUser(userId)
+  var user = await userActions.getUser(userId);
   let values;
   if (user && user.settings) {
-    const setting = user.settings.find((s) => s.name === 'buyPresets');
+    const setting = user.settings.find((s) => s.name === "buyPresets");
     values = setting ? setting.value : defaultValues;
   } else {
     values = defaultValues;
@@ -70,23 +70,22 @@ async function getPresetButtons(userId){
   const buttons = values.map((value) =>
     Markup.button.callback(`Buy ${value} Eth`, `preset:${value}`)
   );
-  return buttons
+  return buttons;
 }
 
-async function getPositionMessage(chatID){
+async function getPositionMessage(chatID) {
   var wallets = await userActions.getAllUserWallets(chatID);
   var positions = await helper.getUserPositions(wallets[0].address);
-  var message = "Positions:\n\n";
+  var message = []
   for (var i = 0; i < positions.result.length; i++) {
-    message += `Token: ${positions.result[i].name}\nAmount: ${positions.result[i].balanceFormatted}\n\n`;
+    message.push(`*Token:* ${positions.result[i].name}\n*Amount:* ${positions.result[i].balanceFormatted.toString().replace(".", "\\.")}\n*USD:* ${positions.result[i].usdValue.toString().replace(".", "\\.")}\\$\n\n`);
   }
-  return message;
+  return [message,positions.result];
 }
-
 
 module.exports = {
   getPositionMessage,
   onMessage,
   onSelectingOption,
-  getPresetButtons
+  getPresetButtons,
 };

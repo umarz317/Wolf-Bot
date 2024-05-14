@@ -1,9 +1,9 @@
 const { getContract, erc20Abi } = require("viem");
 const client = require("./client");
 const uniswapV2RouterABI = require("@uniswap/v2-periphery/build/IUniswapV2Router02.json");
-const V3SwapRouterABI  = require('@uniswap/swap-router-contracts/artifacts/contracts/SwapRouter02.sol/SwapRouter02.json')
-const sushiRouteProcessorABI = require("../abi/routeProcessor.json")
-const sushiFactoryV2ABI = require("../abi/v2sushiFactory.json")
+const V3SwapRouterABI = require("@uniswap/swap-router-contracts/artifacts/contracts/SwapRouter02.sol/SwapRouter02.json");
+const sushiRouteProcessorABI = require("../abi/routeProcessor.json");
+const sushiFactoryV2ABI = require("../abi/v2sushiFactory.json");
 const abiV2Factory = require("@uniswap/v2-periphery/build/IUniswapV2Factory.json");
 
 module.exports = {
@@ -12,6 +12,14 @@ module.exports = {
       address: address,
       abi: erc20Abi,
       client: client.publicClient,
+    });
+    return contract;
+  },
+  getTokenWrite: (address, walletClient) => {
+    var contract = getContract({
+      address: address,
+      abi: erc20Abi,
+      client: walletClient,
     });
     return contract;
   },
@@ -54,5 +62,5 @@ module.exports = {
       client: client,
     });
     return contract;
-  }
+  },
 };

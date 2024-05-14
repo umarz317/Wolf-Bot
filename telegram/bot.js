@@ -11,7 +11,6 @@ const scenes = require("./scenes/sceneMain");
 const helper = require("../utils/helpers");
 const tghelper = require("./helpers");
 
-
 const stage = new Stage([
   scenes.importWalletScene,
   scenes.snipeScene,
@@ -24,6 +23,7 @@ const stage = new Stage([
   scenes.safetySettingScene,
   scenes.presetSettingScene,
   scenes.manualBuyScene,
+  scenes.manualSellScene,
 ]);
 bot.use(stage.middleware());
 
@@ -94,11 +94,32 @@ bot.command("settings", (ctx) => {
   ctx.scene.enter("settings");
 });
 
-bot.command("positions", async(ctx) => {
-  console.log("Positions Command...");
-  var message = await tghelper.getPositionMessage(ctx.chat.id)
-  ctx.reply(message);
+bot.command("positions", async (ctx) => {
+  positionHelper(ctx);
 });
+
+async function positionHelper(ctx) {
+  console.log("Positions action...");
+  var [messages, positions] = await tghelper.getPositionMessage(ctx.chat.id);
+  ctx.reply("📊 Positions\n\n", { parse_mode: "MarkdownV2" });
+  await Promise.resolve(setTimeout((resolve)=>{resolve},100))
+  ctx.session.sellData = positions
+  messages.map((message, index) => {
+    if (positions[index].nativeToken===true) {
+      return;
+    } else {
+      ctx.reply(message, {
+        parse_mode: "MarkdownV2",
+        ...Markup.inlineKeyboard([
+          Markup.button.callback(
+            "💸 Sell",
+            `sellIndex:${index}`
+          ),
+        ]),
+      });
+    }
+  });
+}
 
 bot.command("menu", (ctx) => {
   console.log("Menu Command...");
@@ -138,9 +159,12 @@ bot.action("pendingOrders", (ctx) => {
 });
 
 bot.action("positions", async (ctx) => {
-  console.log("Positions action...");
-  var message = await tghelper.getPositionMessage(ctx.chat.id)
-  ctx.reply(message);
+  positionHelper(ctx);
+});
+
+bot.action(/^sellIndex:/, (ctx) => {
+  ctx.session.sellData = ctx.session.sellData[ctx.callbackQuery.data.split(":")[1]];
+  ctx.scene.enter("manualSell");
 });
 
 function start() {
@@ -156,7 +180,8 @@ function stop() {
   bot.stop();
   console.log("Bot Stopped...");
 }
-(()=>{
+
+(() => {
   try {
     Moralis.start({
       apiKey: process.env.MORALIS_API_KEY,
