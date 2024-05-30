@@ -34,7 +34,7 @@ Wolf is an open-source snipe bot developed for the essentially any EVM-Based Cha
 
 :heavy_check_mark: Manual Buy/Sell: Execute buy and sell orders manually with precision;
 
-:heavy_check_mark: Traditional Sniping: Automatically snipe new token listings;
+:heavy_check_mark: Traditional Sniping: Automatically snipe new token listings on Uniswap V3, V2 and sushiswap V2;
 
 :heavy_check_mark: Wallet Management: Create and manage up to five wallets;
 
