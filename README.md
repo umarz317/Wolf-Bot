@@ -10,7 +10,7 @@
 </p>
 
 <h4 align="center"> 
-	🚧  Wolf 🚀 Under construction...  🚧
+	🚧  Wolf 🐺 Under construction...  🚧
 </h4> 
 
 <hr>
