@@ -29,7 +29,7 @@ bot.use(stage.middleware());
 // Start command
 bot.start(async (ctx) => {
   console.log("Chat ID: ", ctx.chat.id);
-  ctx.reply(`*🎯 Diablo Bot*\n\n*Trade Faster\\!*\n\n`, {
+  ctx.reply(`*🎯 Wolf Bot*\n\n*Trade Faster\\!*\n\n`, {
     parse_mode: "MarkdownV2",
   });
 });
@@ -100,7 +100,7 @@ bot.command("positions", async (ctx) => {
 
 bot.command("menu", (ctx) => {
   console.log("Menu Command...");
-  ctx.reply(`*🎯 Diablo Bot*\n\n*Trade Faster\\!*\n\n`, {
+  ctx.reply(`*🎯 Wolf Bot*\n\n*Trade Faster\\!*\n\n`, {
     parse_mode: "MarkdownV2",
     ...Markup.inlineKeyboard([
       [

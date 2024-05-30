@@ -4,6 +4,7 @@ const {
   CurrencyAmount,
   TradeType,
   Percent,
+  WETH9,
 } = require("@uniswap/sdk-core");
 const { getContract, parseUnits, parseEther } = require("viem");
 const UniswapV2PairABI = require("@uniswap/v2-periphery/build/IUniswapV2Pair.json");
@@ -15,7 +16,7 @@ const helper = require("../../../utils/helpers");
 async function fetchTokensAndPair(addressToken0) {
   var decimals0 = await helper.fetchTokenDecimals(addressToken0);
   var token0 = new Token(ChainId.BASE, addressToken0, decimals0);
-  var token1 = new Token(ChainId.BASE, process.env.WETH, 18);
+  var token1 = new Token(ChainId.BASE, WETH9[ChainId.BASE], 18);
   const pairAddress = Pair.getAddress(token0, token1);
   console.log(pairAddress, "pairAddress");
   var tokens = [token0, token1];

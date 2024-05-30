@@ -13,13 +13,13 @@ const routeProcessorABI = require("../../abi/routeProcessor.json");
 async function submitSushiTx(amountIn, pair, tokenToSnipe, account) {
   try {
     var to = account.address;
-    var route = encodeRoute(pair, process.env.SUSHI_WRAP_TOKEN, to);
+    var route = encodeRoute(pair, Addresses.WETH, to);
     console.log("Simulating route...");
     var amountOut = await publicClient.simulateContract({
-      address: process.env.SUSHI_ROUTE_PROCESSOR,
+      address: Addresses.SUSHI_ROUTE_PROCESSOR,
       abi: routeProcessorABI,
       functionName: "processRoute",
-      args: [process.env.NATIVE_TOKEN, amountIn, tokenToSnipe, 0, to, route],
+      args: [Addresses.NATIVE_TOKEN, amountIn, tokenToSnipe, 0, to, route],
       value: amountIn,
     });
     amountOut = amountOut.result;
@@ -31,7 +31,7 @@ async function submitSushiTx(amountIn, pair, tokenToSnipe, account) {
     console.log("Sending transaction...");
     var hash = await sushiRouteProcessor.write.processRoute(
       [
-        process.env.NATIVE_TOKEN,
+        Addresses.NATIVE_TOKEN,
         amountIn,
         tokenToSnipe,
         amountOutMin,

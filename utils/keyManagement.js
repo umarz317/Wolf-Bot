@@ -29,10 +29,11 @@ function decrypt(pk) {
   decrypted = decrypted + decipher.final("utf8");
   return decrypted.toString();
 }
-// function generateEncryptionKey() {
-//     const key = crypto.randomBytes(32);
-//     const hexKey = key.toString('hex');
-//     return hexKey;
-// }
 
-module.exports = { encrypt, decrypt, generateIV };
+function generateEncryptionKey() {
+    const key = crypto.randomBytes(32);
+    const hexKey = key.toString('hex');
+    return hexKey;
+}
+
+module.exports = { encrypt, decrypt, generateIV,generateEncryptionKey };

@@ -4,11 +4,11 @@ const app = express();
 require("./config/db");
 
 app.listen(8080, () => {
-  console.log("Diablo started");
+  console.log("Wolf started");
 });
 
 app.get("/", (req, res) => {
-  res.send("Diablo Running!");
+  res.send("Wolf Running!");
 });
 
 app.get("/startBot", (req, res) => {

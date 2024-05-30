@@ -42,11 +42,11 @@ async function getPair(address0, client, type) {
   // TODO: Add enums for type/make a constants file for all the strings
   if (type === "sushi V2") {
     var contract = contractHelper.getSushiFactoryV2(client);
-    var pair = await contract.read.getPair([address0, process.env.WETH]);
+    var pair = await contract.read.getPair([address0, Addresses.WETH]);
     return pair;
   } else if (type === "uni V2") {
     var contract = contractHelper.getUniFactoryV2(client);
-    var pair = await contract.read.getPair([address0, process.env.WETH]);
+    var pair = await contract.read.getPair([address0, Addresses.WETH]);
     return pair;
   }
 }

@@ -7,7 +7,7 @@ const snipe = require("../telegram/handler");
 //TODO: Implement sushi snipe?
 function watchPairEvent(chat_ID,tokenToSnipe, amount, account) {
   client.publicClient.watchEvent({
-    address: process.env.PAIR_V2_FACTORY,
+    address: Addresses.PAIR_V2_FACTORY,
     event: abiV2Factory.abi.filter((abi) => abi.name == "PairCreated")[0],
     onLogs: (logs) => {
       console.log('Pair created!')
@@ -25,7 +25,7 @@ function watchPairEvent(chat_ID,tokenToSnipe, amount, account) {
 function watchPairEventV3(chat_ID, tokenToSnipe, amount, account) {
   const weth = WETH9[ChainId.BASE].address
   client.publicClient.watchEvent({
-      address: process.env.V3_FACTORY,
+      address: Addresses.V3_FACTORY,
       event: abiV3Factory.abi.filter((abi) => abi.name == "PoolCreated")[0],
       args: {
           token0: tokenToSnipe,

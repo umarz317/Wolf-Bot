@@ -25,7 +25,7 @@ module.exports = {
   },
   getRouter: (walletClient) => {
     var contract = getContract({
-      address: process.env.ROUTER_V2,
+      address: Addresses.ROUTER_V2,
       abi: uniswapV2RouterABI.abi,
       client: walletClient,
     });
@@ -33,7 +33,7 @@ module.exports = {
   },
   getRouterV3: (walletClient) => {
     var contract = getContract({
-      address: process.env.V3_ROUTER,
+      address: Addresses.V3_ROUTER,
       abi: V3SwapRouterABI.abi,
       client: walletClient,
     });
@@ -41,7 +41,7 @@ module.exports = {
   },
   getSushiFactoryV2: (client) => {
     var contract = getContract({
-      address: process.env.V2_FACTORY_SUSHI,
+      address: Addresses.V2_FACTORY_SUSHI,
       abi: sushiFactoryV2ABI,
       client: client,
     });
@@ -49,7 +49,7 @@ module.exports = {
   },
   getUniFactoryV2: (client) => {
     var contract = getContract({
-      address: process.env.PAIR_V2_FACTORY,
+      address: Addresses.PAIR_V2_FACTORY,
       abi: abiV2Factory.abi,
       client: client,
     });
@@ -57,7 +57,7 @@ module.exports = {
   },
   getSushiRouteProcessor: (client) => {
     var contract = getContract({
-      address: process.env.SUSHI_ROUTE_PROCESSOR,
+      address: Addresses.SUSHI_ROUTE_PROCESSOR,
       abi: sushiRouteProcessorABI,
       client: client,
     });
