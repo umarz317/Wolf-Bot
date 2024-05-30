@@ -6,7 +6,6 @@
 
 <p align="center">
   <img alt="Github top language" src="https://img.shields.io/github/languages/top/umarz317/Wolf-Bot?color=56BEB8">
-  <img alt="Github language count" src="https://img.shields.io/github/languages/count/umarz317/Wolf-Bot?color=56BEB8">
   <img alt="Repository size" src="https://img.shields.io/github/repo-size/umarz317/Wolf-Bot?color=56BEB8">
   <img alt="License" src="https://img.shields.io/github/license/umarz317/Wolf-Bot?color=56BEB8">
 </p>
@@ -30,7 +29,7 @@
 
 ## :dart: About ##
 
-Wolf is an open-source snipe bot developed for the essentially any EVM-Based Chain. Designed with flexibility and efficiency in mind, Wolf enables users to perform manual buy/sell operations as well as traditional sniping with ease. In addition to its sniping capabilities, Wolf includes wallet management features. Users can create and manage up to five wallets, view all assets within these wallets and much more to come in the future!
+Wolf is an open-source snipe bot developed for the essentially any EVM-Based Chain written purely in Javascript. Designed with flexibility and efficiency in mind, Wolf enables users to perform manual buy/sell operations as well as traditional sniping with ease. In addition to its sniping capabilities, Wolf includes wallet management features. Users can create and manage up to five wallets, view all assets within these wallets and much more to come in the future!
 
 ## :sparkles: Features ##
 
