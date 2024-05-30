@@ -32,17 +32,17 @@ Wolf is an open-source snipe bot developed for the essentially any EVM-Based Cha
 
 ## :sparkles: Features ##
 
-:heavy_check_mark: Manual Buy/Sell: Execute buy and sell orders manually with precision;
+:heavy_check_mark: Manual Buy/Sell: Execute buy and sell orders manually.
 
-:heavy_check_mark: Traditional Sniping: Automatically snipe new token listings on Uniswap V3, V2 and sushiswap V2;
+:heavy_check_mark: Traditional Sniping: Automatically snipe new token listings on Uniswap V3, V2 and sushiswap V2.
 
-:heavy_check_mark: Wallet Management: Create and manage up to five wallets;
+:heavy_check_mark: Wallet Management: Create and manage up to five wallets.
 
-:heavy_check_mark: Asset Viewing: View all assets within your wallets;
+:heavy_check_mark: Asset Viewing: View all assets within your wallets.
 
-:heavy_check_mark: Configurable Settings: Tailor the bot's via settings;
+:heavy_check_mark: Configurable Settings: Tailor the bot's via settings.
 
-:heavy_check_mark: User-friendly Interface: Intuitive design for easy navigation and operation;
+:heavy_check_mark: User-friendly Interface: Intuitive design for easy navigation and operation.
 ## :rocket: Technologies ##
 
 The following tools were used in this project:
@@ -81,7 +81,7 @@ You can paste the connection string here for you database.
 $ git clone https://github.com/umarz317/Wolf-Bot
 
 # Access
-$ cd Wolf
+$ cd Wolf-Bot
 
 # Install dependencies
 $ pnpm i
