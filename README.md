@@ -1,8 +1,5 @@
 <div align="center" id="top"> 
-  <img style="border-radius:10px" src="https://cdn.shopify.com/s/files/1/0330/4443/0983/files/wolf-bot-banner.jpg?v=1717093239" alt="Wolf" />
-
-  &#xa0;
-
+    <img style="border-radius:10px;width:500px" src="https://cdn.shopify.com/s/files/1/0330/4443/0983/files/wolf-bot-banner.jpg?v=1717093239" alt="Wolf" />
 </div>
 
 <h1 align="center">Wolf Bot</h1>
@@ -27,7 +24,7 @@
   <a href="#white_check_mark-requirements">Requirements</a> &#xa0; | &#xa0;
   <a href="#checkered_flag-starting">Starting</a> &#xa0; | &#xa0;
   <a href="#memo-license">License</a> &#xa0; | &#xa0;
-  <a href="https://github.com/umarz317" target="_blank">Author</a>
+  <a href="https://github.com/umarz317" target="_blank">Authors</a>
 </p>
 
 
