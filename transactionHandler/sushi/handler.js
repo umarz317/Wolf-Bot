@@ -9,10 +9,12 @@ const {
   getWalletClientFromAccount,
 } = require("../../utils/client");
 const routeProcessorABI = require("../../abi/routeProcessor.json");
+const { Addresses } = require("../../utils/constants");
 
 async function submitSushiTx(amountIn, pair, tokenToSnipe, account) {
   try {
     var to = account.address;
+    console.log("account " + to);
     var route = encodeRoute(pair, Addresses.WETH, to);
     console.log("Simulating route...");
     var amountOut = await publicClient.simulateContract({

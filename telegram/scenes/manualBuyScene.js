@@ -95,7 +95,6 @@ const manualBuyScene = new WizardScene(
     }
     ctx.reply("✅ Pair found.");
     const wallet = await userActions.getAllUserWallets(ctx.chat.id);
-    console.log(wallet);
     if (!wallet || wallet.length === 0) {
       ctx.reply("❌ No wallets found, Please import/create a wallet first.");
       ctx.scene.leave();
@@ -103,9 +102,11 @@ const manualBuyScene = new WizardScene(
     }
     var defaultWalletIndex = await userActions.getUserSettingValue(
       ctx.chat.id,
-      "defaultManualBuyerWallets"
+      "defaultWallet"
     );
+    console.log(defaultWalletIndex);
     defaultWalletIndex = defaultWalletIndex ? defaultWalletIndex : 0;
+    console.log(wallet);
     console.log(ctx.session.swapType);
     if (ctx.session.swapType === "sushi V2") {
       manualBuyer.sushiV2(

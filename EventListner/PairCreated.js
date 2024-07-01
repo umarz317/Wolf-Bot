@@ -4,6 +4,7 @@ const {ChainId,WETH9} = require("@uniswap/sdk-core");
 const client = require("../utils/client");
 const { trim, getAddress } = require("viem");
 const snipe = require("../telegram/handler"); 
+const {Addresses} = require('../utils/constants')
 //TODO: Implement sushi snipe?
 function watchPairEvent(chat_ID,tokenToSnipe, amount, account) {
   client.publicClient.watchEvent({

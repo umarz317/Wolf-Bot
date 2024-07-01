@@ -11,16 +11,10 @@ chainSettingScene.enter(async (ctx) => {
     Markup.inlineKeyboard([
       [
         Markup.button.callback(
-          `Base ${ctx.session.selectedChains === "Base" ? "✅" : ""}`,
+          `Base ${ctx.session.selectedChains === "base" ? "✅" : ""}`,
           "toggle:base"
         ),
       ],
-      // [
-      //   Markup.button.callback(
-      //     `BSC ${ctx.session.selectedChains === "bsc" ? "✅" : ""}`,
-      //     "toggle:bsc"
-      //   ),
-      // ],
       [
         Markup.button.callback("🔙 Back", "back"),
         Markup.button.callback("❌ Close", "close"),

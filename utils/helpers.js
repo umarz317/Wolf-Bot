@@ -4,6 +4,7 @@ const { bot } = require("../telegram/bot");
 const { privateKeyToAddress } = require("viem/accounts");
 const { publicClient } = require("./client");
 const Moralis = require("moralis").default;
+const { Addresses } = require("./constants");
 
 function isValidPrivateKey(pk) {
   if (!pk.startsWith("0x")) {

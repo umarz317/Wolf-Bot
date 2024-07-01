@@ -13,7 +13,7 @@ walletSettingScene.enter(async (ctx) => {
     ...Markup.inlineKeyboard([
       [Markup.button.callback("🔨 Create", "createWallet")],
       [Markup.button.callback("🔑 Import Existing Wallet", "importWallet")],
-      [Markup.button.callback("👉 Set Default Wallet", "setDefaultWallet")],
+      [Markup.button.callback("👉 Set Default Wallet", "defaultWallet")],
       [Markup.button.callback("🗝️ Retrieve Private Keys", "retrievePK")],
       [Markup.button.callback("🗑 Delete Wallet", "deleteWallet")],
       [
@@ -169,8 +169,7 @@ walletSettingScene.action(/^delete:(\d+)$/, async (ctx) => {
 });
 
 const walletOptions = {
-  setDefaultWallet: { name: "Set Default Wallet" },
-  defaultManualBuyerWallets: { name: "Default Manual Buyer Wallets" },
+  defaultWallet: { name: "Set Default Wallet" },
 };
 
 Object.keys(walletOptions).forEach((setting) => {

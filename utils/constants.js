@@ -9,3 +9,5 @@ const Addresses = {
   NATIVE_TOKEN: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
   WETH: "0x4200000000000000000000000000000000000006",
 };
+
+module.exports = { Addresses };

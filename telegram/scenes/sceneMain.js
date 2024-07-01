@@ -97,7 +97,7 @@ const snipeScene = new WizardScene(
     ctx.reply("✅ Snipe setup complete, We'll Snipe the token and update you.");
 
     const wallet = await userActions.getAllUserWallets(ctx.chat.id);
-    var defaultWalletIndex = userActions.getUserSettingValue(ctx.chat.id, "defaultAutoSniperWallet");
+    var defaultWalletIndex = userActions.getUserSettingValue(ctx.chat.id, "defaultWallet");
     defaultWalletIndex = defaultWalletIndex ? defaultWalletIndex : 0;
     event.watchPairEvent(ctx.chat.id, ctx.session.messages[0],ctx.session.messages[1], wallet[defaultWalletIndex]);
     event.watchPairEventV3(ctx.chat.id, ctx.session.messages[0],ctx.session.messages[1], wallet[defaultWalletIndex])

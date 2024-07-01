@@ -5,6 +5,7 @@ const V3SwapRouterABI = require("@uniswap/swap-router-contracts/artifacts/contra
 const sushiRouteProcessorABI = require("../abi/routeProcessor.json");
 const sushiFactoryV2ABI = require("../abi/v2sushiFactory.json");
 const abiV2Factory = require("@uniswap/v2-periphery/build/IUniswapV2Factory.json");
+const {Addresses} = require('./constants')
 
 module.exports = {
   getToken: (address) => {
