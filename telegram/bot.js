@@ -4,7 +4,16 @@ const { Stage } = Scenes;
 const userActions = require("../utils/userActions");
 const bot = new Telegraf(process.env.BOT_TOKEN);
 const Moralis = require("moralis").default;
+// Wallets and private keys are per user, so only serve private chats.
+bot.use((ctx, next) => {
+  if (ctx.chat && ctx.chat.type !== "private") return;
+  return next();
+});
 bot.use(session());
+// Log handler errors instead of letting them stop polling.
+bot.catch((err) => {
+  console.log("Bot error:", err);
+});
 module.exports = { bot }; //important to keep it here
 const scenes = require("./scenes/sceneMain");
 const helper = require("../utils/helpers");
@@ -35,10 +44,10 @@ bot.start(async (ctx) => {
 });
 
 bot.action("createWallet", async (ctx) => {
-  var res = await userActions.doesUserWalletExist(ctx.chat.id);
+  var res = await userActions.doesUserWalletExist(ctx.from.id);
   if (res) {
     const { address, pk, success } =
-      await userActions.generateAndSaveUserWallet(ctx.chat.id);
+      await userActions.generateAndSaveUserWallet(ctx.from.id);
     if (success) {
       ctx.reply(
         `✅ Successfully Created Wallet\n
@@ -61,7 +70,7 @@ bot.action("createWallet", async (ctx) => {
 
 // Handle 'importWallet' action
 bot.action("importWallet", async (ctx) => {
-  var res = await userActions.doesUserWalletExist(ctx.chat.id);
+  var res = await userActions.doesUserWalletExist(ctx.from.id);
   if (res) {
     ctx.scene.enter("import-wallet");
   } else {
@@ -141,21 +150,33 @@ bot.action("positions", async (ctx) => {
 });
 
 bot.action(/^sellIndex:/, (ctx) => {
-  ctx.session.sellData =
-    ctx.session.sellData[ctx.callbackQuery.data.split(":")[1]];
+  const position =
+    ctx.session.positions?.[ctx.callbackQuery.data.split(":")[1]];
+  if (!position) {
+    ctx.reply("❌ Position expired, Please use /positions again.");
+    return;
+  }
+  ctx.session.sellData = position;
   ctx.scene.enter("manualSell");
 });
 
+let running = false;
+
 function start() {
-  try {
-    bot.launch();
-    console.log("Bot Started...");
-  } catch {
-    console.log("Error Launching Bot!");
-  }
+  if (running) return;
+  running = true;
+  console.log("Bot Started...");
+  bot.launch().catch((err) => {
+    running = false;
+    console.log("Error Launching Bot!", err.message);
+    // 409 means another instance is polling; retrying would just conflict again.
+    if (err.response?.error_code !== 409) setTimeout(start, 5000);
+  });
 }
 
 function stop() {
+  if (!running) return;
+  running = false;
   bot.stop();
   console.log("Bot Stopped...");
 }

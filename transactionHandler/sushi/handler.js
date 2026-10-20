@@ -11,7 +11,7 @@ const {
 const routeProcessorABI = require("../../abi/routeProcessor.json");
 const { Addresses } = require("../../utils/constants");
 
-async function submitSushiTx(amountIn, pair, tokenToSnipe, account) {
+async function submitSushiTx(amountIn, pair, tokenToSnipe, account, gasOpts = {}) {
   try {
     var to = account.address;
     console.log("account " + to);
@@ -24,9 +24,8 @@ async function submitSushiTx(amountIn, pair, tokenToSnipe, account) {
       args: [Addresses.NATIVE_TOKEN, amountIn, tokenToSnipe, 0, to, route],
       value: amountIn,
     });
-    amountOut = amountOut.result;
-    amountOut = parseInt(amountOut);
-    var amountOutMin = parseInt(amountOut - amountOut * 0.5);
+    // 10% slippage, kept in bigint to avoid precision loss
+    var amountOutMin = (amountOut.result * 90n) / 100n;
     var walletClient = await getWalletClientFromAccount(account);
     var sushiRouteProcessor =
       contractHelper.getSushiRouteProcessor(walletClient);
@@ -40,7 +39,7 @@ async function submitSushiTx(amountIn, pair, tokenToSnipe, account) {
         to,
         route,
       ],
-      { value: amountIn, gas: 300000n }
+      { value: amountIn, gas: 300000n, ...gasOpts }
     );
     console.log("Transaction hash: " + hash);
     return {hash: hash, error: null};

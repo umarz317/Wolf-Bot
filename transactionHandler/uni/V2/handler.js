@@ -16,7 +16,7 @@ const helper = require("../../../utils/helpers");
 async function fetchTokensAndPair(addressToken0) {
   var decimals0 = await helper.fetchTokenDecimals(addressToken0);
   var token0 = new Token(ChainId.BASE, addressToken0, decimals0);
-  var token1 = new Token(ChainId.BASE, WETH9[ChainId.BASE], 18);
+  var token1 = new Token(ChainId.BASE, WETH9[ChainId.BASE].address, 18);
   const pairAddress = Pair.getAddress(token0, token1);
   console.log(pairAddress, "pairAddress");
   var tokens = [token0, token1];
@@ -48,7 +48,7 @@ async function fetchTrade(addressToken0, amountIn, buy) {
   return [trade, token0, token1, decimals0];
 }
 
-async function submitSwapTx(addressToken0, amountIn, account, buy = true) {
+async function submitSwapTx(addressToken0, amountIn, account, buy = true, gasOpts = {}) {
   try {
     const [trade, token0, token1, decimals0] = await fetchTrade(
       addressToken0,
@@ -69,7 +69,7 @@ async function submitSwapTx(addressToken0, amountIn, account, buy = true) {
     if (buy)
       txHash = await router.write.swapExactETHForTokens(
         [parseUnits(amountOutMin, decimals0), path, account.address, deadline],
-        { value: parseEther(value), gas: 3000000n }
+        { value: parseEther(value), gas: 3000000n, ...gasOpts }
       );
     else {
       console.log(value)
@@ -78,12 +78,11 @@ async function submitSwapTx(addressToken0, amountIn, account, buy = true) {
       if(allowance<=parseUnits(value,decimals0)){
         var tx = await contract.write.approve([router.address,parseUnits(Number.MAX_SAFE_INTEGER.toString(),decimals0)])
         var receipt = await client.publicClient.waitForTransactionReceipt({hash:tx})
-        if(receipt.status==='success'){
-          console.log('Token Approved!')
-        }
-        else{
+        if(receipt.status!=='success'){
           console.log('Token Approval Failed!')
+          return { error: "Token approval failed." };
         }
+        console.log('Token Approved!')
       }
       txHash = await router.write.swapExactTokensForETH([
         parseUnits(value, decimals0),
@@ -91,7 +90,7 @@ async function submitSwapTx(addressToken0, amountIn, account, buy = true) {
         path,
         account.address,
         deadline,
-      ]);
+      ], gasOpts);
     }
     return txHash;
   } catch (e) {

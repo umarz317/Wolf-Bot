@@ -11,25 +11,27 @@ app.get("/", (req, res) => {
   res.send("Wolf Running!");
 });
 
-app.get("/startBot", (req, res) => {
+// Bot control endpoints are disabled unless ADMIN_TOKEN is set and sent as the x-admin-token header.
+function requireAdmin(req, res, next) {
+  const token = process.env.ADMIN_TOKEN;
+  if (!token || req.get("x-admin-token") !== token) {
+    return res.status(403).send("Forbidden");
+  }
+  next();
+}
+
+app.get("/startBot", requireAdmin, (req, res) => {
   bot.start();
   res.send("Started bot.");
 });
 
-app.get("/stopBot", (req, res) => {
+app.get("/stopBot", requireAdmin, (req, res) => {
   bot.stop();
   res.send("Stopped bot.");
 });
 
-process.on("unhandledRejection", (reason, promise) => {
+process.on("unhandledRejection", (reason) => {
   console.log("Unhandled Rejection at:", reason);
-  if (
-    !reason.message
-      .toString()
-      .includes("terminated by other getUpdates request")
-  ) {
-    bot.start();
-  }
 });
 
 bot.start()

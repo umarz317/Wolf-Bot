@@ -36,7 +36,7 @@ const importWalletScene = new WizardScene(
       );
       return;
     }
-    const res = await userActions.importUserWallet(ctx.chat.id, pk);
+    const res = await userActions.importUserWallet(ctx.from.id, pk);
     if (res.success) {
       ctx.reply("✅ " + res.message);
     } else {
@@ -86,21 +86,22 @@ const snipeScene = new WizardScene(
     return ctx.wizard.next();
   },
   async (ctx) => {
-    const amount = ctx.message.text;
-    var tmp = ctx.session.messages;
-    tmp.push(amount);
-    ctx.session.messages = tmp;
-    if (isNaN(amount)) {
+    const amount = ctx.message?.text;
+    if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
       ctx.reply("❌ Invalid amount.\n\nPlease enter a valid amount:",Markup.inlineKeyboard([Markup.button.callback("❌ Cancel Snipe", "cancelSnipe")]));
       return;
     }
-    ctx.reply("✅ Snipe setup complete, We'll Snipe the token and update you.");
+    ctx.session.messages = [ctx.session.messages[0], amount];
 
-    const wallet = await userActions.getAllUserWallets(ctx.chat.id);
-    var defaultWalletIndex = userActions.getUserSettingValue(ctx.chat.id, "defaultWallet");
-    defaultWalletIndex = defaultWalletIndex ? defaultWalletIndex : 0;
-    event.watchPairEvent(ctx.chat.id, ctx.session.messages[0],ctx.session.messages[1], wallet[defaultWalletIndex]);
-    event.watchPairEventV3(ctx.chat.id, ctx.session.messages[0],ctx.session.messages[1], wallet[defaultWalletIndex])
+    const wallet = await userActions.getAllUserWallets(ctx.from.id);
+    if (!wallet || wallet.length === 0) {
+      ctx.reply("❌ No wallets found, Please import/create a wallet first.");
+      return ctx.scene.leave();
+    }
+    var defaultWalletIndex = await userActions.getUserSettingValue(ctx.from.id, "defaultWallet");
+    defaultWalletIndex = wallet[defaultWalletIndex] ? defaultWalletIndex : 0;
+    ctx.reply("✅ Snipe setup complete, We'll Snipe the token and update you.");
+    event.watchSnipe(ctx.chat.id, ctx.session.messages[0], ctx.session.messages[1], wallet[defaultWalletIndex]);
     ctx.scene.leave();
   }
 );

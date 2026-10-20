@@ -1,5 +1,5 @@
 const { Token, ChainId, WETH9 } = require("@uniswap/sdk-core");
-const { getContract, parseEther, formatEther, parseGwei } = require("viem");
+const { getContract, parseGwei } = require("viem");
 const UniswapV3PairABI = require("@uniswap/v3-core/artifacts/contracts/UniswapV3Pool.sol/UniswapV3Pool.json");
 const client = require("../../../utils/client");
 const contractHelper = require("../../../utils/contractHelper");
@@ -14,7 +14,7 @@ async function submitSwapTxV3(addressToken0, pair, fee, amountIn, account) {
       decimals0
     );
     const walletClient = await client.getWalletClientFromAccount(account);
-    var slippageTolerance = 0.10;
+    var slippagePercent = 10n;
     var deadline = Math.floor(Date.now() / 1000) + 60 * 5;
     var recipient = account.address;
     const router = contractHelper.getRouterV3(walletClient);
@@ -31,13 +31,10 @@ async function submitSwapTxV3(addressToken0, pair, fee, amountIn, account) {
           sqrtPriceLimitX96: 0,
         },
       ],
-      //value should be bigint!
-      { value: parseEther(formatEther(amountIn)) }
+      { value: amountIn }
     );
-    const amount = parseInt(amountout.result);
-    var amountOutMinimum = parseInt(
-      amount - (amount * slippageTolerance) / 100
-    ).toString();
+    var amountOutMinimum =
+      (amountout.result * (100n - slippagePercent)) / 100n;
     console.log("Sending TX")
     const txHash = await router.write.exactInputSingle(
       [
@@ -53,22 +50,21 @@ async function submitSwapTxV3(addressToken0, pair, fee, amountIn, account) {
           sqrtPriceLimitX96: 0,
         },
       ],
-      //value should be bigint!
-      { value: parseEther(formatEther(amountIn)),gas:300000n, maxPriorityFeePerGas: parseGwei('10'), }
+      { value: amountIn, gas: 300000n, maxPriorityFeePerGas: parseGwei('10'), }
     );
     console.log("Tx hash: ", txHash);
     return txHash;
   } catch (e) {
     console.log(e);
     console.log("Failed to submit swap tx.");
-    return null;
+    return { error: e.shortMessage || "Failed to submit swap tx." };
   }
 }
 
 
 async function fetchTokensAndPair(addressToken0, pair, decimals0) {
   const [liquidity] = await getPoolData(pair);
-  var token1 = new Token(ChainId.BASE, WETH9[ChainId.BASE], 18);
+  var token1 = new Token(ChainId.BASE, WETH9[ChainId.BASE].address, 18);
   var token0 = new Token(ChainId.BASE, addressToken0, decimals0);
   return [token0, token1];
 }

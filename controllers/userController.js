@@ -93,7 +93,14 @@ module.exports = {
   },
   deleteUserWallet: async (id, indexToDelete) => {
     const user = await User.findOne({ id: id });
+    if (!user || !user.wallets[indexToDelete]) return;
     user.wallets.splice(indexToDelete, 1);
+    // Keep the default wallet pointing at the same wallet after indexes shift.
+    const defaultSetting = user.settings.find((s) => s.name === "defaultWallet");
+    if (defaultSetting) {
+      if (defaultSetting.value === indexToDelete) defaultSetting.value = 0;
+      else if (defaultSetting.value > indexToDelete) defaultSetting.value -= 1;
+    }
     await user.save();
   },
   updateUserSetting: async (userId, settingName, settingValue) => {
@@ -102,7 +109,7 @@ module.exports = {
       let user = await User.findOne({ id: userId });
       if (!user) {
         user = new User({
-          userId: userId,
+          id: userId,
           settings: [{ name: settingName, value: settingValue }],
         });
       } else {

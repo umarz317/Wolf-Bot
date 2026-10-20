@@ -1,11 +1,36 @@
 const submitTX = require("../transactionHandler/submitTX");
-const { parseEther, formatEther } = require("viem");
+const { parseEther, formatEther, parseGwei } = require("viem");
 const client = require("../utils/client");
+const userActions = require("../utils/userActions");
 const { bot } = require("./bot");
+
+// Applies the user's "Manual Buy Gwei" setting as the priority fee; otherwise viem estimates gas.
+async function getGasOpts(chat_ID, type) {
+  if (type !== "Buy") return {};
+  const buyGwei = await userActions.getUserSettingValue(chat_ID, "buyGwei");
+  return buyGwei != null ? { maxPriorityFeePerGas: parseGwei(String(buyGwei)) } : {};
+}
+
+function toWei(amount) {
+  try {
+    const wei = parseEther(String(amount));
+    return wei > 0n ? wei : null;
+  } catch {
+    return null;
+  }
+}
+
+function sendFailure(chat_ID, type, token, amount, reason) {
+  bot.telegram.sendMessage(
+    chat_ID,
+    `❌ ${type} Failed\n\n🎯 Token: ${token}\n\n💰 Amount: ${amount}\n\n🔗 Reason: ${reason}`
+  );
+}
 
 module.exports = {
   V2: async (chat_ID, tokenToSnipe, amountIn, account, type, buy = true) => {
-    const txHash = await submitTX.V2(tokenToSnipe, amountIn, account, buy);
+    const gasOpts = await getGasOpts(chat_ID, type);
+    const txHash = await submitTX.V2(tokenToSnipe, amountIn, account, buy, gasOpts);
     if (txHash.error) {
       bot.telegram.sendMessage(
         chat_ID,
@@ -41,7 +66,12 @@ module.exports = {
     }
   },
   V3: async (chat_ID, tokenToSnipe, pair, fee, amountIn, account, type) => {
-    amountIn = parseEther(amountIn).toString();
+    const rawAmount = amountIn;
+    amountIn = toWei(amountIn);
+    if (amountIn === null) {
+      sendFailure(chat_ID, type, tokenToSnipe, rawAmount, "Invalid amount");
+      return;
+    }
     const txHash = await submitTX.V3(
       tokenToSnipe,
       pair,
@@ -49,7 +79,10 @@ module.exports = {
       amountIn,
       account
     );
-    if (!txHash) return;
+    if (txHash.error) {
+      sendFailure(chat_ID, type, tokenToSnipe, rawAmount, txHash.error);
+      return;
+    }
     bot.telegram.sendMessage(chat_ID, `Tx submitted: ${txHash}`);
     try {
       console.log("Waiting for receipt.");
@@ -80,21 +113,30 @@ module.exports = {
     }
   },
   sushiV2: async (chat_ID, tokenToSnipe, pair, amountIn, account, type) => {
-    amountIn = parseEther(amountIn);
+    const rawAmount = amountIn;
+    amountIn = toWei(amountIn);
+    if (amountIn === null) {
+      sendFailure(chat_ID, type, tokenToSnipe, rawAmount, "Invalid amount");
+      return;
+    }
+    const gasOpts = await getGasOpts(chat_ID, type);
     const txHash = await submitTX.sushiV2(
       amountIn,
       pair,
       tokenToSnipe,
-      account
+      account,
+      gasOpts
     );
-    console.log(txHash.error, "here");
     if (txHash.error) {
-      var errMsg = txHash.error.message.split("Details:");
-      bot.telegram.sendMessage(
+      const details = (txHash.error.message || "").split("Details:")[1];
+      sendFailure(
         chat_ID,
-        `❌ ${type} Failed\n\n🎯 Token: ${tokenToSnipe}\n\n💰 Amount: ${formatEther(
-          amountIn
-        )}\n\n🔗 Reason: ${errMsg[1].split("Version:")[0]}`
+        type,
+        tokenToSnipe,
+        rawAmount,
+        details
+          ? details.split("Version:")[0]
+          : txHash.error.shortMessage || "Failed to submit swap tx."
       );
       return;
     }

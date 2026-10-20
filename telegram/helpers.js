@@ -12,17 +12,17 @@ async function onMessage(ctx, settingsOptions) {
       const userId = ctx.from.id;
       ctx.deleteMessage(ctx.session.botMessageId);
       ctx.deleteMessage(ctx.session.userMsgId);
-      const { previousValue } = await userActions.updateUserSetting(
+      const { previousValue } = (await userActions.updateUserSetting(
         userId,
         settingType,
         settingValue
-      );
+      )) || {};
       ctx.reply(
         `${settingsOptions[settingType].name} Previous Value: ${
-          previousValue
-            ? previousValue
-            : setting.defaultValue + " " + setting.unit
-            ? setting.defaultValue
+          previousValue != null
+            ? `${previousValue} ${setting.unit}`
+            : setting.defaultValue !== ""
+            ? `${setting.defaultValue} ${setting.unit} (default)`
             : "Not Set"
         }.\nNew Value: ${settingValue} ${setting.unit}.`
       );
@@ -44,7 +44,7 @@ async function onMessage(ctx, settingsOptions) {
 async function onSelectingOption(ctx, option, settingsOptions) {
   let sentMessage;
   const value = await userActions.getUserSettingValue(ctx.from.id, option);
-  if (value)
+  if (value != null)
     sentMessage = await ctx.reply(
       `Current value: ${value}.\nEnter the value for ${settingsOptions[option].name} in format: ${settingsOptions[option].format}.`
     );
@@ -73,45 +73,62 @@ async function getPresetButtons(userId) {
   return buttons;
 }
 
+function escapeMarkdown(text) {
+  return String(text).replace(/[_*[\]()~`>#+\-=|{}.!\\]/g, "\\$&");
+}
+
 async function positionHelper(ctx) {
   console.log("Positions action...");
-  var [messages, positions] = await getPositionMessage(ctx.chat.id);
-  await Promise.resolve(
-    setTimeout((resolve) => {
-      resolve;
-    }, 400)
+  var wallets = await userActions.getAllUserWallets(ctx.from.id);
+  if (!wallets || wallets.length === 0) {
+    ctx.reply("❌ No wallets found, Please import/create a wallet first.");
+    return;
+  }
+  // Positions come from the default wallet, which is the one manual sell uses.
+  var defaultWalletIndex = await userActions.getUserSettingValue(
+    ctx.from.id,
+    "defaultWallet"
   );
-  ctx.session.sellData = positions;
-  messages.map((message, index) => {
-    if (positions[index].nativeToken === true) {
-      return;
-    } else {
-      ctx.reply(message, {
-        parse_mode: "MarkdownV2",
-        ...Markup.inlineKeyboard([
-          Markup.button.callback("💸 Sell", `sellIndex:${index}`),
-        ]),
-      });
-    }
+  var wallet = wallets[defaultWalletIndex] || wallets[0];
+  var [messages, positions] = await getPositionMessage(wallet.address);
+  if (!positions) {
+    ctx.reply("❌ Failed to fetch positions, Please try again later.");
+    return;
+  }
+  ctx.session.positions = positions;
+  if (positions.every((position) => position.nativeToken)) {
+    ctx.reply("⊖ No Positions");
+    return;
+  }
+  messages.forEach((message, index) => {
+    if (positions[index].nativeToken) return;
+    ctx.reply(message, {
+      parse_mode: "MarkdownV2",
+      ...Markup.inlineKeyboard([
+        Markup.button.callback("💸 Sell", `sellIndex:${index}`),
+      ]),
+    });
   });
 }
 
-async function getPositionMessage(chatID) {
-  var wallets = await userActions.getAllUserWallets(chatID);
-  var positions = await helper.getUserPositions(wallets[0].address);
-  var message = [];
-  for (var i = 0; i < positions.result.length; i++) {
-    message.push(
-      `*Token:* ${positions.result[i].name}\n*Amount:* ${positions.result[
-        i
-      ].balanceFormatted
-        .toString()
-        .replace(".", "\\.")}\n*USD:* ${positions.result[i].usdValue
-        .toString()
-        .replace(".", "\\.")}\\$\n\n`
-    );
-  }
-  return [message, positions.result];
+async function getPositionMessage(address) {
+  var response = await helper.getUserPositions(address);
+  if (!response) return [[], null];
+  // Keep plain values so session data doesn't depend on Moralis internals.
+  var positions = response.result.map((p) => ({
+    name: p.name,
+    tokenAddress: p.tokenAddress ? p.tokenAddress.checksum : null,
+    balanceFormatted: p.balanceFormatted,
+    usdValue: p.usdValue,
+    nativeToken: p.nativeToken === true,
+  }));
+  var messages = positions.map(
+    (p) =>
+      `*Token:* ${escapeMarkdown(p.name)}\n*Amount:* ${escapeMarkdown(
+        p.balanceFormatted
+      )}\n*USD:* ${escapeMarkdown(p.usdValue ?? "N/A")}\\$\n\n`
+  );
+  return [messages, positions];
 }
 
 module.exports = {

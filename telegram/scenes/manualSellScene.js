@@ -31,11 +31,15 @@ const manualSellScene = new WizardScene(
     return ctx.wizard.next();
   },
   (ctx) => {
-    var amount = ctx.message.text;
+    var amount = ctx.message?.text;
     var data = ctx.session.sellData;
-    if (parseFloat(data.balanceFormatted) <= parseFloat(amount)) {
+    if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
+      ctx.reply("❌ Invalid amount.\n\nPlease enter a valid amount:");
+      return;
+    }
+    if (parseFloat(amount) > parseFloat(data.balanceFormatted)) {
       ctx.reply("Balance Low!");
-      ctx.scene.leave();
+      return ctx.scene.leave();
     }
     ctx.session.amount = amount;
     ctx.wizard.next();
@@ -45,7 +49,7 @@ const manualSellScene = new WizardScene(
     var value = ctx.session.amount;
     ctx.reply("🔃Fetching Pair.....");
     const pair = await helpers.getPair(
-      ctx.session.sellData.tokenAddress._value,
+      ctx.session.sellData.tokenAddress,
       client.publicClient,
       ctx.session.swapType
     );
@@ -63,22 +67,22 @@ const manualSellScene = new WizardScene(
       return;
     }
     ctx.reply("✅ Pair found.");
-    const wallet = await userActions.getAllUserWallets(ctx.chat.id);
+    const wallet = await userActions.getAllUserWallets(ctx.from.id);
     if (!wallet || wallet.length === 0) {
       ctx.reply("❌ No wallets found, Please import/create a wallet first.");
       ctx.scene.leave();
       return;
     }
     var defaultWalletIndex = await userActions.getUserSettingValue(
-      ctx.chat.id,
+      ctx.from.id,
       "defaultWallet"
     );
-    defaultWalletIndex = defaultWalletIndex ? defaultWalletIndex : 0;
+    defaultWalletIndex = wallet[defaultWalletIndex] ? defaultWalletIndex : 0;
     console.log(ctx.session.swapType);
     if (ctx.session.swapType === "sushi V2") {
       manualTrade.sushiV2(
         ctx.chat.id,
-        ctx.session.sellData.tokenAddress._value,
+        ctx.session.sellData.tokenAddress,
         pair,
         value,
         wallet[defaultWalletIndex],
@@ -88,7 +92,7 @@ const manualSellScene = new WizardScene(
       console.log(ctx.session.swapType);
       manualTrade.V2(
         ctx.chat.id,
-        ctx.session.sellData.tokenAddress._value,
+        ctx.session.sellData.tokenAddress,
         value,
         wallet[defaultWalletIndex],
         "Sell",

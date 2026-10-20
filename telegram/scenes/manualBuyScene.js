@@ -94,18 +94,18 @@ const manualBuyScene = new WizardScene(
       return;
     }
     ctx.reply("✅ Pair found.");
-    const wallet = await userActions.getAllUserWallets(ctx.chat.id);
+    const wallet = await userActions.getAllUserWallets(ctx.from.id);
     if (!wallet || wallet.length === 0) {
       ctx.reply("❌ No wallets found, Please import/create a wallet first.");
       ctx.scene.leave();
       return;
     }
     var defaultWalletIndex = await userActions.getUserSettingValue(
-      ctx.chat.id,
+      ctx.from.id,
       "defaultWallet"
     );
     console.log(defaultWalletIndex);
-    defaultWalletIndex = defaultWalletIndex ? defaultWalletIndex : 0;
+    defaultWalletIndex = wallet[defaultWalletIndex] ? defaultWalletIndex : 0;
     console.log(wallet);
     console.log(ctx.session.swapType);
     if (ctx.session.swapType === "sushi V2") {
